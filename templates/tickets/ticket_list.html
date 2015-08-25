@@ -1,0 +1,42 @@
+{% extends base_template %}
+{% block main_content %}
+    <div class="table-responsive">
+        <table class="table table-condensed">
+            <thead><tr><th>ticket</th><th>state</th><th>severity</th><th>date</th><th>description</th></tr></thead>
+            <tbody>
+            {% for ticket in object_list %}
+                    <tr class="{% ifequal ticket.state 1 %}danger{% endifequal %}{% ifequal ticket.state 2 %}warning{% endifequal %}{% ifequal ticket.state 3 %}success{% endifequal %}{% ifequal ticket.state 4 %}active{% endifequal %}">
+                        <th>{{ ticket.ticket_number }}</th>
+                        <th>
+                            {% if user.is_staff %}
+                                {{ ticket.staff }}
+                            {% else %}
+                                {{ ticket.get_state_display }}
+                            {% endif %}
+                        </th>
+                        <th>
+                            {% ifequal ticket.severity 1 %}<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>{% endifequal %}
+                            {% ifequal ticket.severity 2 %}<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>{% endifequal %}
+                            {% ifequal ticket.severity 3 %}<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>{% endifequal %}
+                            {% ifequal ticket.severity 4 %}<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>{% endifequal %}
+                            {{ ticket.get_severity_display }}
+                        </th>
+                        <th>
+                            {% if ticket.state > 2 %}
+                                delayed for {{ ticket.resolucion_delta }}
+                            {% else %}
+                                {{ ticket.creation_date }}</th>
+                            {% endif %}
+                        <th>
+                            {% if ticket.state > 2 %}
+                                {{ ticket.resolution_text }}
+                            {% else %}
+                                {{ ticket.description }}</th>
+                            {% endif %}
+                        </th>
+                    </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock main_content %}

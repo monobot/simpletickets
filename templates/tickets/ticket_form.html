@@ -1,0 +1,12 @@
+{% extends base_template %}
+{% load bootstrap %}
+{% block main_content %}
+<form method="post">
+    {% csrf_token %}
+    {{ form|bootstrap }}
+    Fields marked with * are mandatory
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+{% endblock main_content %}

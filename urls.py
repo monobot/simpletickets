@@ -2,19 +2,16 @@
 from django.conf.urls import patterns, url
 from django.contrib import admin
 
-from views import (TicketList, TicketCreate, TicketDetails, TicketDelete,
-        TicketEdit)
+from views import (TicketList, TicketCreate, TicketDelete,
+        TicketUpdate)
 
 admin.autodiscover()
 
-urlpatterns = patterns(
-    url(r'^ticket-List/$', TicketList.as_view(), name='ticketList'),
-    url(r'^ticket-detail-(?P<ticket_id>[\d]*)/$',
-            TicketDetails.as_view(), name='ticketDetails'),
-    url(r'^new-ticket/$', TicketCreate, name='newTicket'),
+urlpatterns = patterns('',
+    url(r'^ticket-list/$', TicketList.as_view(), name='ticketList'),
+    url(r'^new-ticket/$', TicketCreate.as_view(), name='newTicket'),
     url(r'^edit-ticket-(?P<ticket_id>[\d]*)/$',
-            TicketEdit.AS_view(), name='ticketEdit'),
-    url(r'^edit-ticket-(?P<ticket_id>[\d]*)/$',
-            TicketDelete.AS_view(), name='ticketEdit'),
-
+            TicketUpdate.as_view(), name='TicketUpdate'),
+    url(r'^delete-ticket-(?P<ticket_id>[\d]*)/$',
+            TicketDelete.as_view(), name='TicketDelete'),
     )
