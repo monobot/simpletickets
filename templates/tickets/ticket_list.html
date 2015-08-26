@@ -1,12 +1,13 @@
 {% extends base_template %}
-{% block main_content %}
+{% block blocktickets %}
     <div class="table-responsive">
         <table class="table table-condensed">
-            <thead><tr><th>ticket</th><th>state</th><th>severity</th><th>date</th><th>description</th></tr></thead>
+            <thead><tr><th>ticket</th><th>actions</th><th>state</th><th>severity</th><th>date</th><th>description</th></tr></thead>
             <tbody>
             {% for ticket in object_list %}
                     <tr class="{% ifequal ticket.state 1 %}danger{% endifequal %}{% ifequal ticket.state 2 %}warning{% endifequal %}{% ifequal ticket.state 3 %}success{% endifequal %}{% ifequal ticket.state 4 %}active{% endifequal %}">
                         <th>{{ ticket.ticket_number }}</th>
+                        <th>{% if not request.user.is_staff %}<a href="{% url 'TicketDelete' ticket.id %}" role="button">X</a>{% endif %}</th>
                         <th>
                             {% if user.is_staff %}
                                 {{ ticket.staff }}
@@ -36,7 +37,8 @@
                         </th>
                     </tr>
             {% endfor %}
+            <tr>{% if not request.user.is_staff %}<a href="{% url 'newTicket' %}" role="button">+</a>{% endif %}</tr>
             </tbody>
         </table>
     </div>
-{% endblock main_content %}
+{% endblock blocktickets %}
