@@ -52,3 +52,4 @@ TICKET_STATE = (
         (3, _(u'solved')),
         (4, _(u'closed')),
         )
+
