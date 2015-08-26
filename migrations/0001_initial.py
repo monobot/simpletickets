@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 import django.utils.timezone
 from django.conf import settings
-import tickets.models
+import simple_tickets.models
 
 
 class Migration(migrations.Migration):
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('state', models.IntegerField(default=1, choices=[(1, 'new'), (2, 'assigned'), (3, 'solved'), (4, 'closed')])),
                 ('creation_date', models.DateTimeField(default=django.utils.timezone.now, verbose_name='Creation Date')),
                 ('description', models.TextField(default=b'...', verbose_name='Description')),
-                ('attachment', models.FileField(null=True, upload_to=tickets.models.uploadAttachment, blank=True)),
+                ('attachment', models.FileField(null=True, upload_to=simple_tickets.models.uploadAttachment, blank=True)),
                 ('resolution_date', models.DateTimeField(null=True, verbose_name='Resolution date', blank=True)),
                 ('resolution_text', models.TextField(null=True, verbose_name='Resolution text', blank=True)),
                 ('staff', models.ForeignKey(related_name='usrStaff', blank=True, to=settings.AUTH_USER_MODEL, null=True)),

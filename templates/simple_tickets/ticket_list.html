@@ -7,7 +7,13 @@
             {% for ticket in object_list %}
                     <tr class="{% ifequal ticket.state 1 %}danger{% endifequal %}{% ifequal ticket.state 2 %}warning{% endifequal %}{% ifequal ticket.state 3 %}success{% endifequal %}{% ifequal ticket.state 4 %}active{% endifequal %}">
                         <th>{{ ticket.ticket_number }}</th>
-                        <th>{% if not request.user.is_staff %}<a href="{% url 'TicketDelete' ticket.id %}" role="button">X</a>{% endif %}</th>
+                        <th>
+                            <div class="btn-group" role="group" aria-label="...">
+                                {% if not request.user.is_staff %}
+                                    <a href="{% url 'TicketDelete' ticket.id %}" role="button" class="btn btn-default">X</a>
+                                {% endif %}
+                            </div>
+                        </th>
                         <th>
                             {% if user.is_staff %}
                                 {{ ticket.staff }}
