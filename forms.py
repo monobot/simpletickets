@@ -2,7 +2,7 @@
 from django import forms
 from django.utils.translation import ugettext as _
 
-from models import Ticket
+from models import Ticket, ResponseTicket
 
 
 class TicketForm(forms.ModelForm):
@@ -22,10 +22,12 @@ class TicketForm(forms.ModelForm):
         return text
 
 
-class TicketFormAdmin(forms.ModelForm):
+class ResponseTicketForm(forms.ModelForm):
     class Meta(object):
-        model = Ticket
-        fields = ('ticket_type', 'severity', 'state', 'resolution_text')
+        model = ResponseTicket
+        fields = ('asigned_to', 'ticket_type', 'severity', 'state',
+                'resolution_text',
+                )
 
     def clean_resolution_text(self):
         text = self.cleaned_data['resolution_text']

@@ -38,7 +38,8 @@
                             {% endif %}
                         <th>
                             {% if ticket.state > 2 %}
-                                {{ ticket.resolution_text }}
+                                {# {{ ticket.resolution_text }} #}
+                                pendiente texto de resolucion
                             {% else %}
                                 {{ ticket.description }}</th>
                             {% endif %}
