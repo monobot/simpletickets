@@ -16,13 +16,27 @@ def uploadAttachment(instance, filename):
     return os.path.join(TICKET_ATTACHMENTS, filename)
 
 
-class Ticket(models.Model):
+class TimeStamper(models.Model):
+    creation_date = models.DateTimeField(_('Creation Date'),
+            default=timezone.now)
+    modification_date = models.DateTimeField(_('Last Modification Date'),
+            blank=True, null=True)
+    resolution_date = models.DateTimeField(_('Resolution date'),
+            blank=True, null=True)
+
+    def resolution_delta(self):
+        return self.resolution_date - self.creation_date
+
+    def save(self, *args, **kwargs):
+        self.modification_date = timezone.now()
+        super(TimeStamper, self).save(*args, **kwargs)
+
+    class Meta(object):
+        abstract = True
+
+
+class Ticket(TimeStamper):
     user = models.ForeignKey(User,)
-    staff = models.ForeignKey(User,
-            limit_choices_to={'is_staff': True},
-            related_name='usrStaff',
-            blank=True, null=True,
-            )
 
     ticket_number = models.CharField(max_length=8,
                 blank=True,
@@ -34,24 +48,13 @@ class Ticket(models.Model):
 
     state = models.IntegerField(default=1, choices=TICKET_STATE)
 
-    creation_date = models.DateTimeField(_('Creation Date'),
-            default=timezone.now)
-
     description = models.TextField(ugl(u'Description'),
             default='...')
     attachment = models.FileField(upload_to=uploadAttachment,
             blank=True, null=True)
 
-    resolution_date = models.DateTimeField(ugl(u'Resolution date'),
-            blank=True, null=True)
-    resolution_text = models.TextField(ugl(u'Resolution text'),
-            blank=True, null=True)
-
     def __unicode__(self):
         return u'%s, %s' % (self.user, self.ticket_type)
-
-    def resolucion_delta(self):
-        return self.resolution_date - self.creation_date
 
     def resolucion_tag(self):
         return mark_safe(self.resolution_text)
@@ -60,10 +63,50 @@ class Ticket(models.Model):
         super(Ticket, self).save(*args, **kwargs)
         if not self.ticket_number:
             self.ticket_number = str(self.creation_date)[2:4] + (
-                    '00000000{id}'.format(id=self.id))[-6:]
+                    '00000{id}'.format(id=self.id))[-6:]
             self.save()
 
     class Meta(object):
         verbose_name = 'Ticket'
         verbose_name_plural = 'Tickets'
+        ordering = ('state', 'severity', 'creation_date')
+
+
+class ResponseTicket(TimeStamper):
+    ticket = models.ForeignKey(Ticket)
+
+    staff = models.ForeignKey(User,
+            limit_choices_to={'is_staff': True},
+            related_name='usrStaff',
+            blank=True, null=True,
+            )
+
+    asigned_to = models.ForeignKey(User,
+            limit_choices_to={'is_staff': True},
+            related_name='assigned',
+            blank=True, null=True,
+            )
+
+    ticket_type = models.IntegerField(default=2, choices=TICKET_TYPE)
+    severity = models.IntegerField(default=3, choices=TICKET_SEVERITY)
+    state = models.IntegerField(default=1, choices=TICKET_STATE)
+
+    resolution_text = models.TextField(ugl(u'Description'),
+            default='')
+
+    def save(self, *args, **kwargs):
+        self.ticket.ticket_type = self.ticket_type
+        self.ticket.severity = self.severity
+        self.ticket.state = self.state
+        if self.state > 2:
+            now = timezone.now()
+            self.resolution_date = now
+            self.ticket.resolution_date = now
+        self.ticket.save()
+
+        super(ResponseTicket, self).save(*args, **kwargs)
+
+    class Meta(object):
+        verbose_name = 'Response Ticket'
+        verbose_name_plural = 'Response Tickets'
         ordering = ('state', 'severity', 'creation_date')

@@ -11,6 +11,8 @@
                             <div class="btn-group" role="group" aria-label="...">
                                 {% if not request.user.is_staff %}
                                     <a href="{% url 'TicketDelete' ticket.id %}" role="button" class="btn btn-default">X</a>
+                                {% else %}
+                                    <a href="{% url 'TicketResponse' ticket.id %}" role="button" class="btn btn-default">R</a>
                                 {% endif %}
                             </div>
                         </th>

@@ -31,10 +31,9 @@ class Login_required_mixin(View):
 
 
 class TicketMixin(object):
-
     def get_queryset(self):
         if self.request.user.is_staff:
-            return Ticket.objects.all()
+            return Ticket.objects.filter(user__is_staff=False)
         return Ticket.objects.filter(user=self.request.user)
 
     def get_object(self):
@@ -53,6 +52,21 @@ class TicketCreate(ContextMixin, Login_required_mixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super(TicketCreate, self).form_valid(form)
+
+
+class TicketCreateResponse(ContextMixin, Login_required_mixin, CreateView):
+    title = _('Edit ticket')
+    model = Ticket
+    fields = ['ticket_type', 'severity', 'state', 'resolution_text', ]
+    success_message = _('response was successfully created')
+    error_message = _('Please check the failures bellow')
+    success_url = reverse_lazy('ticketList')
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        form.instance.ticket = Ticket.objects.get(
+                id=self.kwargs.get('ticket_id'))
+        return super(TicketCreateResponse, self).form_valid(form)
 
 
 class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
