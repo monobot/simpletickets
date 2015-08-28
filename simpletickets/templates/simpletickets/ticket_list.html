@@ -1,5 +1,5 @@
 {% extends base_template %}
-{% block blocktickets %}
+{% block simpletickets %}
     <div class="table-responsive">
         <table class="table table-condensed">
             <thead><tr><th>ticket</th><th>actions</th><th>state</th><th>severity</th><th>date</th><th>description</th></tr></thead>
@@ -38,8 +38,7 @@
                             {% endif %}
                         <th>
                             {% if ticket.state > 2 %}
-                                {# {{ ticket.resolution_text }} #}
-                                pendiente texto de resolucion
+                                {{ ticket.last_response.resolution_text }}
                             {% else %}
                                 {{ ticket.description }}</th>
                             {% endif %}
@@ -50,4 +49,4 @@
             </tbody>
         </table>
     </div>
-{% endblock blocktickets %}
+{% endblock simpletickets %}

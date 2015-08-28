@@ -29,7 +29,7 @@ Add simpletickets urls to your main project urls.py file:
 There are some variables that can be set up in your settings file/s:
 (The shown assigments are the default values)
 
-**BASE_TEMPLATE** is the base template where the tickets will be shown, its assumend that will be a block named 'blocktickets'
+**BASE_TEMPLATE** is the base template where the tickets will be shown, its assumend that will be a block named 'simpletickets'
 
 `BASE_TEMPLATE = 'index.html'`
 

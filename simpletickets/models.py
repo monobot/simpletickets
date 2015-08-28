@@ -66,6 +66,12 @@ class Ticket(TimeStamper):
                     '00000{id}'.format(id=self.id))[-6:]
             self.save()
 
+    def get_responses(self):
+        return self.responseticket_set.all()
+
+    def last_response(self):
+        return self.responseticket_set.all()[0]
+
     class Meta(object):
         verbose_name = 'Ticket'
         verbose_name_plural = 'Tickets'
@@ -89,7 +95,7 @@ class ResponseTicket(TimeStamper):
 
     ticket_type = models.IntegerField(default=2, choices=TICKET_TYPE)
     severity = models.IntegerField(default=3, choices=TICKET_SEVERITY)
-    state = models.IntegerField(default=1, choices=TICKET_STATE)
+    state = models.IntegerField(default=2, choices=TICKET_STATE)
 
     resolution_text = models.TextField(ugl(u'Description'),
             default='')
