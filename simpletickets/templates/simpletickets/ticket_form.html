@@ -1,7 +1,10 @@
 {% extends 'simpletickets/tickets_base.html' %}
 {% load bootstrap %}
 {% block tickets %}
+{% if request.user.is_staff %}
+<h3>{{ form.instance.description }}</h3>
 
+{% endif %}
 <form method="post">
     {% csrf_token %}
     {{ form|bootstrap }}

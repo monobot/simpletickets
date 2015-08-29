@@ -16,32 +16,6 @@ def uploadAttachment(instance, filename):
     return os.path.join(TICKET_ATTACHMENTS, filename)
 
 
-class TimeStamperManager(models.Manager):
-    def fastest(self):
-        print 'tarar'
-        return TimeStamper.objects.all()[0]
-
-
-class TimeStamper(models.Model):
-    objects = TimeStamperManager()
-    creation_date = models.DateTimeField(_('Creation Date'),
-            default=timezone.now)
-    modification_date = models.DateTimeField(_('Last Modification Date'),
-            blank=True, null=True)
-    resolution_date = models.DateTimeField(_('Resolution date'),
-            blank=True, null=True)
-
-    def resolution_delta(self):
-        return self.resolution_date - self.creation_date
-
-    def save(self, *args, **kwargs):
-        self.modification_date = timezone.now()
-        super(TimeStamper, self).save(*args, **kwargs)
-
-    class Meta(object):
-        abstract = True
-
-
 class TicketManager(models.Manager):
     def n_open(self):
         return len(Ticket.objects.filter(state__lt=4))
@@ -52,8 +26,11 @@ class TicketManager(models.Manager):
     def n_total(self):
         return len(Ticket.objects.all())
 
+    def fastest(self):
+        return Ticket.objects.all()[0]
 
-class Ticket(TimeStamper):
+
+class Ticket(models.Model):
     objects = TicketManager()
     ticket_number = models.CharField(max_length=8,
                 blank=True,
@@ -78,6 +55,16 @@ class Ticket(TimeStamper):
     resolution_text = models.TextField(ugl(u'Resolution text'),
             default='')
 
+    creation_date = models.DateTimeField(_('Creation Date'),
+            default=timezone.now)
+    modification_date = models.DateTimeField(_('Last Modification Date'),
+            blank=True, null=True)
+    resolution_date = models.DateTimeField(_('Resolution date'),
+            blank=True, null=True)
+
+    def resolution_delta(self):
+        return self.resolution_date - self.creation_date
+
     def __unicode__(self):
         return u'%s, %s' % (self.user, self.ticket_type)
 
@@ -85,15 +72,12 @@ class Ticket(TimeStamper):
         return mark_safe(self.resolution_text)
 
     def save(self, *args, **kwargs):
+        self.modification_date = timezone.now()
         super(Ticket, self).save(*args, **kwargs)
         if not self.ticket_number:
             self.ticket_number = str(self.creation_date)[2:4] + (
                     '00000{id}'.format(id=self.id))[-6:]
             self.save()
-
-    def fastest(self):
-        print 'tarar'
-        return Ticket.objects.all()[0]
 
     class Meta(object):
         verbose_name = 'Ticket'
