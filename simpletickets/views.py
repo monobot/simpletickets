@@ -19,7 +19,20 @@ class ContextMixin(SuccessMessageMixin, View):
         context = super(ContextMixin, self).get_context_data(**kwargs)
         context['title'] = self.title
         context['base_template'] = BASE_TEMPLATE
-        context['objects'] = Ticket.objects
+
+        n_solved = Ticket.objects.n_solved()
+        n_total = Ticket.objects.n_total()
+
+        if n_solved and n_total:
+            context['porc_solved'] = n_solved * 100 / n_total
+            context['porc_pending'] = 100 - context['porc_solved']
+        elif n_total:
+            context['porc_solved'] = 0
+            context['porc_pending'] = 100
+        else:
+            context['porc_solved'] = 100
+            context['porc_pending'] = 0
+
         return context
 
 
@@ -66,7 +79,7 @@ class TicketDelete(ContextMixin, Login_required_mixin, TicketMixin,
 
 class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
         UpdateView):
-    title = _('Delete ticket')
+    title = _('Edit ticket')
     model = Ticket
     success_url = reverse_lazy('home')
     success_message = _('ticket was successfully updated')

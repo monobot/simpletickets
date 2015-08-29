@@ -17,17 +17,11 @@ def uploadAttachment(instance, filename):
 
 
 class TicketManager(models.Manager):
-    def n_open(self):
-        return len(Ticket.objects.filter(state__lt=4))
-
     def n_solved(self):
-        return len(Ticket.objects.filter(state=4))
+        return len(Ticket.objects.filter(state__gt=2))
 
     def n_total(self):
         return len(Ticket.objects.all())
-
-    def fastest(self):
-        return Ticket.objects.all()[0]
 
 
 class Ticket(models.Model):
@@ -73,6 +67,10 @@ class Ticket(models.Model):
 
     def save(self, *args, **kwargs):
         self.modification_date = timezone.now()
+        if self.state > 2:
+            self.resolution_date = timezone.now()
+        elif self.staff and self.state == 1:
+            self.state = 2
         super(Ticket, self).save(*args, **kwargs)
         if not self.ticket_number:
             self.ticket_number = str(self.creation_date)[2:4] + (
@@ -80,6 +78,6 @@ class Ticket(models.Model):
             self.save()
 
     class Meta(object):
-        verbose_name = 'Ticket'
-        verbose_name_plural = 'Tickets'
+        verbose_name = _('Ticket')
+        verbose_name_plural = _('Tickets')
         ordering = ('state', 'severity', 'creation_date')

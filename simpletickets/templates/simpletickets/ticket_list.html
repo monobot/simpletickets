@@ -39,13 +39,13 @@
                             </th>
                             <th>
                                 {% if ticket.state > 2 %}
-                                    delayed for {{ ticket.resolucion_delta }}
+                                    delayed for {{ ticket.resolution_delta }}
                                 {% else %}
                                     {{ ticket.creation_date }}</th>
                                 {% endif %}
                             <th>
                                 {% if ticket.state > 2 %}
-                                    {{ ticket.last_response.resolution_text }}
+                                    {{ ticket.resolution_text }}
                                 {% else %}
                                     {{ ticket.description }}</th>
                                 {% endif %}

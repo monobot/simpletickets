@@ -1,13 +1,27 @@
 {% extends base_template %}
-{% load calctag %}
 {% block simpletickets %}
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
-                <div class="btn-group" role="group" aria-label="main actions">
-                    <a href="{% url 'ticketList' %}" role="button" class="btn btn-info" title="list">Tickets</a>
-                    <a href="{% url 'newTicket' %}" role="button" class="btn btn-success" title="create">New ticket</a>
-                </div>
+                <nav class="navbar navbar-default">
+                    <div class="container-fluid">
+                        <div class="navbar-header">
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <a class="navbar-brand" href="#">Ticket system</a>
+                        </div>
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav">
+                                <button href="{% url 'ticketList' %}" type="button" class="btn btn-info navbar-btn">Tickets</button>
+                                <button href="{% url 'newTicket' %}" type="button" class="btn btn-success navbar-btn">New ticket</button>
+                            </ul>
+                        </div>
+                    </div>{# div .container-fluid #}
+                </nav>{# nav .navbar #}
             </div>
         </div>{# div .rov #}
         <div class="row">
@@ -41,11 +55,11 @@
                                 <div class="col-xl-6 col-md-6 col-xs-12"><p>Solved vs pending tickets </p></div>
                                 <div class="col-xl-6 col-md-6 col-xs-12">
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ objects.n_solved|porcent:objects.n_total }}" aria-valuemin="0" aria-valuemax="100" style="min-width: 3em; width: {{ objects.n_solved|porcent:objects.n_total }}%">
-                                        {{ objects.n_solved|porcent:objects.n_total }}%
+                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ porc_solved }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ porc_solved }}%">
+                                        {{ porc_solved }}%
                                         </div>
-                                        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{ objects.n_open|porcent:objects.n_total }}" aria-valuemin="0" aria-valuemax="100" style="min-width: 3em; width: {{ objects.n_open|porcent:objects.n_total }}%">
-                                        {{ objects.n_open|porcent:objects.n_total }}%
+                                        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{ porc_pending }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ porc_pending }}%">
+                                        {{ porc_pending }}%
                                         </div>
                                     </div>
                                 </div>
