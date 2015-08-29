@@ -1,0 +1,27 @@
+{% extends base_template %}
+{% block simpletickets %}
+    <div class="container-fluid">
+        <div class="row">
+        <a href="{% url 'ticketList' %}" role="button">ticket list</a>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                {% block tickets %}
+                {% endblock tickets %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xl-4 col-md-6 col-xs-12">
+                <h3>Resolution times</h3>
+                <p>Fastest resolution time:  {{ objects.fastest.resolution_delta }}</p>
+                <p>Usual resolution time</p>
+            </div>
+            <div class="col-xl-4 col-md-6 col-xs-12">
+                <h3>Tickets statistics</h3>
+                <p>Total number of pending tickets {{ objects.n_open }}</p>
+                <p>Total number of tickets {{ objects.n_total }}</p>
+                <p>Total number of solved tickets {{ objects.n_solved }}</p>
+            </div>
+        </div>
+    </div>
+{% endblock simpletickets %}

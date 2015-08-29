@@ -2,10 +2,10 @@
 from django import forms
 from django.utils.translation import ugettext as _
 
-from models import Ticket, ResponseTicket
+from models import Ticket
 
 
-class TicketForm(forms.ModelForm):
+class TicketFormUser(forms.ModelForm):
     class Meta(object):
         model = Ticket
         fields = ('ticket_type', 'severity', 'description')
@@ -22,10 +22,10 @@ class TicketForm(forms.ModelForm):
         return text
 
 
-class ResponseTicketForm(forms.ModelForm):
+class TicketFormStaff(forms.ModelForm):
     class Meta(object):
-        model = ResponseTicket
-        fields = ('asigned_to', 'ticket_type', 'severity', 'state',
+        model = Ticket
+        fields = ('staff', 'ticket_type', 'severity', 'state',
                 'resolution_text',
                 )
 

@@ -16,7 +16,14 @@ def uploadAttachment(instance, filename):
     return os.path.join(TICKET_ATTACHMENTS, filename)
 
 
+class TimeStamperManager(models.Manager):
+    def fastest(self):
+        print 'tarar'
+        return TimeStamper.objects.all()[0]
+
+
 class TimeStamper(models.Model):
+    objects = TimeStamperManager()
     creation_date = models.DateTimeField(_('Creation Date'),
             default=timezone.now)
     modification_date = models.DateTimeField(_('Last Modification Date'),
@@ -35,23 +42,41 @@ class TimeStamper(models.Model):
         abstract = True
 
 
-class Ticket(TimeStamper):
-    user = models.ForeignKey(User,)
+class TicketManager(models.Manager):
+    def n_open(self):
+        return len(Ticket.objects.filter(state__lt=4))
 
+    def n_solved(self):
+        return len(Ticket.objects.filter(state=4))
+
+    def n_total(self):
+        return len(Ticket.objects.all())
+
+
+class Ticket(TimeStamper):
+    objects = TicketManager()
     ticket_number = models.CharField(max_length=8,
                 blank=True,
                 null=True)
 
+    user = models.ForeignKey(User,)
+    staff = models.ForeignKey(User,
+            limit_choices_to={'is_staff': True},
+            related_name='usrStaff',
+            blank=True, null=True,
+            )
+
     ticket_type = models.IntegerField(default=2, choices=TICKET_TYPE)
-
     severity = models.IntegerField(default=3, choices=TICKET_SEVERITY)
-
     state = models.IntegerField(default=1, choices=TICKET_STATE)
 
     description = models.TextField(ugl(u'Description'),
             default='...')
     attachment = models.FileField(upload_to=uploadAttachment,
             blank=True, null=True)
+
+    resolution_text = models.TextField(ugl(u'Resolution text'),
+            default='')
 
     def __unicode__(self):
         return u'%s, %s' % (self.user, self.ticket_type)
@@ -66,53 +91,11 @@ class Ticket(TimeStamper):
                     '00000{id}'.format(id=self.id))[-6:]
             self.save()
 
-    def get_responses(self):
-        return self.responseticket_set.all()
-
-    def last_response(self):
-        return self.responseticket_set.all()[0]
+    def fastest(self):
+        print 'tarar'
+        return Ticket.objects.all()[0]
 
     class Meta(object):
         verbose_name = 'Ticket'
         verbose_name_plural = 'Tickets'
-        ordering = ('state', 'severity', 'creation_date')
-
-
-class ResponseTicket(TimeStamper):
-    ticket = models.ForeignKey(Ticket)
-
-    staff = models.ForeignKey(User,
-            limit_choices_to={'is_staff': True},
-            related_name='usrStaff',
-            blank=True, null=True,
-            )
-
-    asigned_to = models.ForeignKey(User,
-            limit_choices_to={'is_staff': True},
-            related_name='assigned',
-            blank=True, null=True,
-            )
-
-    ticket_type = models.IntegerField(default=2, choices=TICKET_TYPE)
-    severity = models.IntegerField(default=3, choices=TICKET_SEVERITY)
-    state = models.IntegerField(default=2, choices=TICKET_STATE)
-
-    resolution_text = models.TextField(ugl(u'Description'),
-            default='')
-
-    def save(self, *args, **kwargs):
-        self.ticket.ticket_type = self.ticket_type
-        self.ticket.severity = self.severity
-        self.ticket.state = self.state
-        if self.state > 2:
-            now = timezone.now()
-            self.resolution_date = now
-            self.ticket.resolution_date = now
-        self.ticket.save()
-
-        super(ResponseTicket, self).save(*args, **kwargs)
-
-    class Meta(object):
-        verbose_name = 'Response Ticket'
-        verbose_name_plural = 'Response Tickets'
         ordering = ('state', 'severity', 'creation_date')

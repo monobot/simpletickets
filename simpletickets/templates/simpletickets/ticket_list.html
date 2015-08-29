@@ -1,5 +1,5 @@
-{% extends base_template %}
-{% block simpletickets %}
+{% extends 'simpletickets/tickets_base.html' %}
+{% block tickets %}
     <div class="table-responsive">
         <table class="table table-condensed">
             <thead><tr><th>ticket</th><th>actions</th><th>state</th><th>severity</th><th>date</th><th>description</th></tr></thead>
@@ -8,12 +8,15 @@
                     <tr class="{% ifequal ticket.state 1 %}danger{% endifequal %}{% ifequal ticket.state 2 %}warning{% endifequal %}{% ifequal ticket.state 3 %}success{% endifequal %}{% ifequal ticket.state 4 %}active{% endifequal %}">
                         <th>{{ ticket.ticket_number }}</th>
                         <th>
-                            <div class="btn-group" role="group" aria-label="...">
+                            <div class="btn-group btn-group-xs" role="group" aria-label="...">
                                 {% if not request.user.is_staff %}
-                                    <a href="{% url 'TicketDelete' ticket.id %}" role="button" class="btn btn-default">X</a>
-                                {% else %}
-                                    <a href="{% url 'TicketResponse' ticket.id %}" role="button" class="btn btn-default">R</a>
+                                    {% ifequal ticket.state 1 %}
+                                        <a href="{% url 'TicketDelete' ticket.id %}" role="button" class="btn btn-danger" title="delete">X</a>
+                                    {% else %}
+                                        <button disabled="disabled" type="button" class="btn btn-default">X</button>
+                                    {% endifequal %}
                                 {% endif %}
+                                <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
                             </div>
                         </th>
                         <th>
@@ -45,8 +48,10 @@
                         </th>
                     </tr>
             {% endfor %}
-            <tr>{% if not request.user.is_staff %}<a href="{% url 'newTicket' %}" role="button">+</a>{% endif %}</tr>
+            {% if not request.user.is_staff %}
+            <tr><th>new ticket</th><th><div class="btn-group btn-group-xs" role="group" aria-label="..."><a href="{% url 'newTicket' %}" role="button" class="btn btn-success" title="create">+</a></div></th><th></th><th></th><th></th><th></th></tr>
+            {% endif %}
             </tbody>
         </table>
     </div>
-{% endblock simpletickets %}
+{% endblock tickets %}

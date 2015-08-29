@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
-from models import Ticket, ResponseTicket  # noqa
+from models import Ticket  # noqa
 
 
 @admin.register(Ticket)
@@ -12,28 +12,13 @@ class TicketAdmin(admin.ModelAdmin):
             'state',
             'severity',
             'ticket_type',
-            'creation_date'
+            'creation_date',
             )
     list_filter = (
+            'user',
+            'staff',
             'severity',
             'creation_date',
             'ticket_type',
-            )
-
-
-@admin.register(ResponseTicket)
-class ResponseTicketAdmin(admin.ModelAdmin):
-    list_display = (
-            'staff',
-            'state',
-            'severity',
-            'ticket_type',
-            'creation_date'
-            )
-    list_filter = (
-            'staff',
-            'asigned_to',
-            'severity',
             'creation_date',
-            'ticket_type',
             )

@@ -6,10 +6,10 @@ from django.utils.translation import ugettext_lazy as _
 
 from django.views.generic import View
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, DeleteView  # , UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from models import Ticket, ResponseTicket
-# from forms import TicketForm, ResponseTicketForm
+from models import Ticket
+from forms import TicketFormUser, TicketFormStaff
 from settings import BASE_TEMPLATE
 
 
@@ -19,6 +19,7 @@ class ContextMixin(SuccessMessageMixin, View):
         context = super(ContextMixin, self).get_context_data(**kwargs)
         context['title'] = self.title
         context['base_template'] = BASE_TEMPLATE
+        context['objects'] = Ticket.objects
         return context
 
 
@@ -54,37 +55,6 @@ class TicketCreate(ContextMixin, Login_required_mixin, CreateView):
         return super(TicketCreate, self).form_valid(form)
 
 
-class ResponseTicketCreate(ContextMixin, Login_required_mixin, CreateView):
-    title = _('Create Response')
-    model = ResponseTicket
-    fields = ['ticket_type', 'severity', 'state', 'resolution_text', ]
-    success_message = _('response was successfully created')
-    error_message = _('Please check the failures bellow')
-    success_url = reverse_lazy('ticketList')
-    template_name = 'simpletickets/model_form.html'
-
-    def form_valid(self, form):
-        form.instance.user = self.request.user
-        form.instance.ticket = Ticket.objects.get(
-                id=self.kwargs.get('ticket_id'))
-        return super(ResponseTicketCreate, self).form_valid(form)
-
-
-# class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
-#         UpdateView):
-#     title = _('Edit ticket')
-#     model = Ticket
-#     fields = ['ticket_type', 'severity', 'description', 'attachment', ]
-#     success_message = _('ticket was successfully updated')
-#     error_message = _('Please check the failures bellow')
-#     success_url = reverse_lazy('ticketList')
-
-#     def get_form_class(self):
-#         if self.request.user.is_staff:
-#             return TicketFormAdmin
-#         return TicketForm
-
-
 class TicketDelete(ContextMixin, Login_required_mixin, TicketMixin,
         DeleteView):
     title = _('Delete ticket')
@@ -92,6 +62,26 @@ class TicketDelete(ContextMixin, Login_required_mixin, TicketMixin,
     success_url = reverse_lazy('home')
     success_message = _('ticket was successfully deleted')
     success_url = reverse_lazy('ticketList')
+
+
+class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
+        UpdateView):
+    title = _('Delete ticket')
+    model = Ticket
+    success_url = reverse_lazy('home')
+    success_message = _('ticket was successfully updated')
+    success_url = reverse_lazy('ticketList')
+
+    def get_form_class(self):
+        if self.request.user.is_staff:
+            return TicketFormStaff
+        return TicketFormUser
+
+    def form_valid(self, form):
+        ticket = form.instance
+        if not ticket.staff and self.request.user.is_staff:
+            ticket.staff = self.request.user
+        return super(TicketUpdate, self).form_valid(form)
 
 
 class TicketList(ContextMixin, Login_required_mixin, TicketMixin, ListView):

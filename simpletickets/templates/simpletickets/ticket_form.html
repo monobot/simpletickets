@@ -1,6 +1,6 @@
-{% extends base_template %}
+{% extends 'simpletickets/tickets_base.html' %}
 {% load bootstrap %}
-{% block simpletickets %}
+{% block tickets %}
 
 <form method="post">
     {% csrf_token %}
@@ -11,4 +11,4 @@
     </div>
 </form>
 
-{% endblock simpletickets %}
+{% endblock tickets %}
