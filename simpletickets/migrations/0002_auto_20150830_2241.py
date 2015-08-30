@@ -11,9 +11,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
+        migrations.AlterField(
             model_name='ticket',
-            name='ticket',
-            field=models.ForeignKey(related_name='masterticket', blank=True, to='simpletickets.Ticket', null=True),
+            name='state',
+            field=models.CharField(default=b'new', max_length=15, choices=[(b'new', 'new'), (b'assigned', 'assigned'), (b'solved', 'solved'), (b'closed', 'closed')]),
         ),
     ]

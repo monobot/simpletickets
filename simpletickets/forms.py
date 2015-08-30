@@ -3,6 +3,7 @@ from django import forms
 from django.utils.translation import ugettext as _
 
 from models import Ticket
+from settings import TICKET_STATE
 
 
 class TicketFormUser(forms.ModelForm):
@@ -36,3 +37,8 @@ class TicketFormStaff(forms.ModelForm):
             raise forms.ValidationError(
                     _(u'Please be extensive on the explanation'))
         return text
+
+    def __init__(self, *args, **kwargs):
+        super(TicketFormStaff, self).__init__(*args, **kwargs)
+        CHOICES = list(TICKET_STATE)[1:-1]
+        self.fields['state'].choices = CHOICES

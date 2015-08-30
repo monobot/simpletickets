@@ -39,11 +39,19 @@ There are some variables that can be set up in your settings file/s:
 BASE_TEMPLATE = 'index.html'
 ```
 
+**DELTA_CLOSE** is the timedelta and item changes irself from solved to closed
+
+```python
+DELTA_CLOSE = timedelta(hours=6)
+```
+
 **TICKET_ATTACHMENTS** is the folder where the ticket's attachments will be uploaded to
 
 ```python
 TICKET_ATTACHMENTS = os.path.join(settings.MEDIA_ROOT, 'tickets')
 ```
+
+Changes on the next variables can supose great changes on the templates, even when we have take in mind many cases; consider using your own templates if they dont perfectly fit.
 
 **TICKET_TYPE** is the different kind of tickets, that is a category of tickets
 
@@ -51,8 +59,8 @@ TICKET_ATTACHMENTS = os.path.join(settings.MEDIA_ROOT, 'tickets')
 TICKET_TYPE = (
         (1, _(u'Inform about an error')),
         (2, _(u'Problem')),
-        (3, _(u'Propose a sugestion')),
-        (4, _(u'Others')),
+        (8, _(u'Propose a sugestion')),
+        (9, _(u'Others')),
         )
 ```
 
@@ -73,7 +81,8 @@ TICKET_SEVERITY = (
 TICKET_STATE = (
         (1, _(u'new')),
         (2, _(u'assigned')),
-        (3, _(u'solved')),
-        (4, _(u'closed')),
+        (5, _(u'delayed')),
+        (8, _(u'solved')),
+        (9, _(u'closed')),
         )
 ```

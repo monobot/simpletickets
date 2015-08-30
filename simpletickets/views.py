@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.urlresolvers import reverse_lazy
@@ -20,6 +22,7 @@ class ContextMixin(SuccessMessageMixin, View):
         context['title'] = self.title
         context['base_template'] = BASE_TEMPLATE
 
+        all_tickets = Ticket.objects.all()
         n_solved = Ticket.objects.n_solved()
         n_total = Ticket.objects.n_total()
 
@@ -32,6 +35,14 @@ class ContextMixin(SuccessMessageMixin, View):
         else:
             context['porc_solved'] = 100
             context['porc_pending'] = 0
+
+        if all_tickets.filter(state__gt=2):
+            context['fastest'] = all_tickets.filter(state__gt=2).order_by(
+                    'resolution_delta')[0].humanized_delta()
+            context['media'] = timedelta(seconds=sum(
+                    [t.resolution_delta for t in all_tickets.filter(
+                            state__gt=2)]) / n_solved
+                    )
 
         return context
 
@@ -94,6 +105,10 @@ class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
         ticket = form.instance
         if not ticket.staff and self.request.user.is_staff:
             ticket.staff = self.request.user
+        if not self.request.user.is_staff and ticket.state == 8:
+            ticket.state = 2
+            ticket.resolution_date = None
+            ticket.resolution_delta = None
         return super(TicketUpdate, self).form_valid(form)
 
 

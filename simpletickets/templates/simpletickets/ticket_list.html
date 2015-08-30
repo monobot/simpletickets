@@ -9,51 +9,63 @@
                 <thead><tr><th>ticket</th><th>actions</th><th>state</th><th>severity</th><th>date</th><th>description</th></tr></thead>
                 <tbody>
                 {% for ticket in object_list %}
-                        <tr class="{% ifequal ticket.state 1 %}danger{% endifequal %}{% ifequal ticket.state 2 %}warning{% endifequal %}{% ifequal ticket.state 3 %}success{% endifequal %}{% ifequal ticket.state 4 %}active{% endifequal %}">
-                            <th>{{ ticket.ticket_number }}</th>
-                            <th>
+                        <tr class="{% ifequal ticket.state 1 %}danger{% endifequal %}{% ifequal ticket.state 2 %}warning{% endifequal %}{% if ticket.state > 2 and ticket.state < 8 %}info{% endif %}{% ifequal ticket.state 8 %}success{% endifequal %}{% ifequal ticket.state 9 %}active{% endifequal %}">
+                            <td>{{ ticket.ticket_number }}</td>
+                            <td>
                                 <div class="btn-group btn-group-xs" role="group" aria-label="ticket actions">
                                     {% if not request.user.is_staff %}
                                         {% ifequal ticket.state 1 %}
                                             <a href="{% url 'TicketDelete' ticket.id %}" role="button" class="btn btn-danger" title="delete">X</a>
+                                            <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
                                         {% else %}
                                             <button disabled="disabled" type="button" class="btn btn-default">X</button>
+                                            {% ifequal ticket.state 8 %}
+                                                <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
+                                            {% else %}
+                                                <button disabled="disabled" type="button" class="btn btn-default">M</button>
+                                            {% endifequal %}
                                         {% endifequal %}
+                                    {% else %}
+                                        <button disabled="disabled" type="button" class="btn btn-default">X</button>
+                                        {% ifnotequal ticket.state 9 %}
+                                            <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
+                                        {% else %}
+                                            <button disabled="disabled" type="button" class="btn btn-default">M</button>
+                                        {% endifnotequal %}
                                     {% endif %}
-                                    <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
                                 </div>
-                            </th>
-                            <th>
+                            </td>
+                            <td>
                                 {% if user.is_staff %}
                                     {{ ticket.staff }}
                                 {% else %}
                                     {{ ticket.get_state_display }}
                                 {% endif %}
-                            </th>
-                            <th>
+                            </td>
+                            <td>
                                 {% ifequal ticket.severity 1 %}<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>{% endifequal %}
                                 {% ifequal ticket.severity 2 %}<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>{% endifequal %}
                                 {% ifequal ticket.severity 3 %}<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>{% endifequal %}
                                 {% ifequal ticket.severity 4 %}<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>{% endifequal %}
                                 {{ ticket.get_severity_display }}
-                            </th>
-                            <th>
-                                {% if ticket.state > 2 %}
-                                    delayed for {{ ticket.resolution_delta }}
+                            </td>
+                            <td>
+                                {% if ticket.state == 8 or ticket.state == 9 %}
+                                    delayed for {{ ticket.humanized_delta }}
                                 {% else %}
-                                    {{ ticket.creation_date }}</th>
+                                    {{ ticket.creation_date }}</td>
                                 {% endif %}
-                            <th>
+                            <td>
                                 {% if ticket.state > 2 %}
                                     {{ ticket.resolution_text }}
                                 {% else %}
-                                    {{ ticket.description }}</th>
+                                    {{ ticket.description }}</td>
                                 {% endif %}
-                            </th>
+                            </td>
                         </tr>
                 {% endfor %}
                 {% if not request.user.is_staff %}
-                <tr><th>new ticket</th><th><div class="btn-group btn-group-xs" role="group"><a href="{% url 'newTicket' %}" role="button" class="btn btn-success" title="create">+</a></div></th><th></th><th></th><th></th><th></th></tr>
+                <tr><td>new ticket</td><td><div class="btn-group btn-group-xs" role="group"><a href="{% url 'newTicket' %}" role="button" class="btn btn-success" title="create">+</a></div></td><td></td><td></td><td></td><td></td></tr>
                 {% endif %}
                 </tbody>
             </table>
@@ -61,6 +73,7 @@
                     <span>Leyend:</span>
                     <span class="text-danger">new</span> |
                     <span class="text-warning">asigned</span> |
+                    <span class="text-info">delayed</span> |
                     <span class="text-success">solved</span> |
                     <span class="text-active">closed</span> |
                 </div>

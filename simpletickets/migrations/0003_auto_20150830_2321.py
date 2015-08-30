@@ -7,13 +7,13 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('simpletickets', '0004_auto_20150829_1206'),
+        ('simpletickets', '0002_auto_20150830_2241'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='ticket',
-            name='resolution_text',
-            field=models.TextField(default=b'', verbose_name='Resolution text'),
+            name='state',
+            field=models.IntegerField(default=1, choices=[(1, 'new'), (2, 'assigned'), (5, 'delayed'), (8, 'solved'), (9, 'closed')]),
         ),
     ]

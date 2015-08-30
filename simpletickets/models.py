@@ -9,7 +9,7 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy as ugl
 
 from settings import (TICKET_ATTACHMENTS, TICKET_TYPE, TICKET_SEVERITY,
-        TICKET_STATE)
+        TICKET_STATE, DELTA_CLOSE)
 
 
 def uploadAttachment(instance, filename):
@@ -22,6 +22,15 @@ class TicketManager(models.Manager):
 
     def n_total(self):
         return len(Ticket.objects.all())
+
+    def all(self):
+        all_objects = super(TicketManager, self).all()
+        for obj in all_objects:
+            if obj.state == 8 and (
+                    obj.resolution_date + DELTA_CLOSE < timezone.now()):
+                obj.state = 9
+                obj.save()
+        return all_objects
 
 
 class Ticket(models.Model):
@@ -56,26 +65,37 @@ class Ticket(models.Model):
     resolution_date = models.DateTimeField(_('Resolution date'),
             blank=True, null=True)
 
-    def resolution_delta(self):
-        return self.resolution_date - self.creation_date
-
-    def __unicode__(self):
-        return u'%s, %s' % (self.user, self.ticket_type)
+    resolution_delta = models.FloatField(_('delayed time in seconds'),
+            blank=True, null=True)
 
     def resolucion_tag(self):
         return mark_safe(self.resolution_text)
 
+    def humanized_delta(self):
+        return self.resolution_date - self.creation_date
+
     def save(self, *args, **kwargs):
         self.modification_date = timezone.now()
-        if self.state > 2:
+        if self.state == 1:
+            if self.staff:
+                self.state = 2
+        elif (self.state != 2 and self.state != 1
+                ) and not self.resolution_date:
             self.resolution_date = timezone.now()
-        elif self.staff and self.state == 1:
-            self.state = 2
+        if self.resolution_date:
+            delta = self.resolution_date - self.creation_date
+            self.resolution_delta = int(delta.total_seconds())
         super(Ticket, self).save(*args, **kwargs)
         if not self.ticket_number:
             self.ticket_number = str(self.creation_date)[2:4] + (
                     '00000{id}'.format(id=self.id))[-6:]
             self.save()
+
+    def __unicode__(self):
+        return u'{ticket_number} {user}'.format(
+                ticket_number=self.ticket_number,
+                user=self.user,
+                )
 
     class Meta(object):
         verbose_name = _('Ticket')
