@@ -6,14 +6,21 @@
         </div>
         <div class="table-responsive">
             <table class="table table-condensed">
-                <thead><tr><th>ticket</th><th>actions</th><th>state</th><th>severity</th><th>date</th><th>description</th></tr></thead>
+                <thead><tr><th>ticket</th><th>ACTIONS</th><th>state</th><th>severity</th><th>date</th><th>description</th></tr></thead>
                 <tbody>
                 {% for ticket in object_list %}
                         <tr class="{% ifequal ticket.state 1 %}danger{% endifequal %}{% ifequal ticket.state 2 %}warning{% endifequal %}{% if ticket.state > 2 and ticket.state < 8 %}info{% endif %}{% ifequal ticket.state 8 %}success{% endifequal %}{% ifequal ticket.state 9 %}active{% endifequal %}">
                             <td>{{ ticket.ticket_number }}</td>
                             <td>
                                 <div class="btn-group btn-group-xs" role="group" aria-label="ticket actions">
-                                    {% if not request.user.is_staff %}
+                                    {% if request.user.is_staff %}
+                                        <button disabled="disabled" type="button" class="btn btn-default">X</button>
+                                        {% if ticket.state < 8  %}
+                                            <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
+                                        {% else %}
+                                            <button disabled="disabled" type="button" class="btn btn-default">M</button>
+                                        {% endif %}
+                                    {% else %}
                                         {% ifequal ticket.state 1 %}
                                             <a href="{% url 'TicketDelete' ticket.id %}" role="button" class="btn btn-danger" title="delete">X</a>
                                             <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
@@ -25,13 +32,11 @@
                                                 <button disabled="disabled" type="button" class="btn btn-default">M</button>
                                             {% endifequal %}
                                         {% endifequal %}
+                                    {% endif %}
+                                    {% if ticket.attachment %}
+                                        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
                                     {% else %}
-                                        <button disabled="disabled" type="button" class="btn btn-default">X</button>
-                                        {% ifnotequal ticket.state 9 %}
-                                            <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
-                                        {% else %}
-                                            <button disabled="disabled" type="button" class="btn btn-default">M</button>
-                                        {% endifnotequal %}
+                                        <button disabled="disabled" type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
                                     {% endif %}
                                 </div>
                             </td>
@@ -50,14 +55,16 @@
                                 {{ ticket.get_severity_display }}
                             </td>
                             <td>
-                                {% if ticket.state == 8 or ticket.state == 9 %}
+                                {% if ticket.state > 7 %}
                                     delayed for {{ ticket.humanized_delta }}
                                 {% else %}
                                     {{ ticket.creation_date }}</td>
                                 {% endif %}
                             <td>
                                 {% if ticket.state > 2 %}
-                                    {{ ticket.resolution_text }}
+                                    {% if  ticket.state < 9 %}
+                                        {{ ticket.resolution_text }}
+                                    {% endif %}
                                 {% else %}
                                     {{ ticket.description }}</td>
                                 {% endif %}

@@ -9,6 +9,7 @@ class TicketAdmin(admin.ModelAdmin):
     list_display = (
             'ticket_number',
             'user',
+            'staff',
             'state',
             'severity',
             'ticket_type',

@@ -7,9 +7,12 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy as ugl
+from django.conf import settings
 
-from settings import (TICKET_ATTACHMENTS, TICKET_TYPE, TICKET_SEVERITY,
-        TICKET_STATE, DELTA_CLOSE)
+from settings import (TICKET_ATTACHMENTS, DELTA_CLOSE, TICKET_TYPE,
+        TICKET_SEVERITY, TICKET_STATE)
+
+from simpleemail.email_helper import EmailManager
 
 
 def uploadAttachment(instance, filename):
@@ -18,7 +21,7 @@ def uploadAttachment(instance, filename):
 
 class TicketManager(models.Manager):
     def n_solved(self):
-        return len(Ticket.objects.filter(state__gt=2))
+        return len(Ticket.objects.filter(state__gt=7))
 
     def n_total(self):
         return len(Ticket.objects.all())
@@ -27,7 +30,8 @@ class TicketManager(models.Manager):
         all_objects = super(TicketManager, self).all()
         for obj in all_objects:
             if obj.state == 8 and (
-                    obj.resolution_date + DELTA_CLOSE < timezone.now()):
+                    obj.resolution_date + DELTA_CLOSE <
+                    timezone.now()):
                 obj.state = 9
                 obj.save()
         return all_objects
@@ -79,8 +83,7 @@ class Ticket(models.Model):
         if self.state == 1:
             if self.staff:
                 self.state = 2
-        elif (self.state != 2 and self.state != 1
-                ) and not self.resolution_date:
+        elif self.state > 7:
             self.resolution_date = timezone.now()
         if self.resolution_date:
             delta = self.resolution_date - self.creation_date
@@ -90,6 +93,57 @@ class Ticket(models.Model):
             self.ticket_number = str(self.creation_date)[2:4] + (
                     '00000{id}'.format(id=self.id))[-6:]
             self.save()
+
+        self._mailSender()
+
+    def _mailSender(self):
+        if self.state == 9:
+            context = ('We are glad we have solved your ticket number: '
+                    '{ticket_number}\n\n'
+                    'The resolution time was {resolution_delta}.\n\n'
+                    'You have {DELTA_CLOSE} hours to reopen it, '
+                    'remember to carefully explain your reasons.\nThe Team'
+                    ).format(
+                            ticket_number=self.ticket_number,
+                            resolution_delta=self.resolution_delta,
+                            DELTA_CLOSE=DELTA_CLOSE,
+                    )
+            subject = ('Your ticket number {ticket_number} has been solved'
+                    ).format(
+                            ticket_number=self.ticket_number,
+                    )
+            body = ('Your {ticket_number} has been solved!').format(
+                            ticket_number=self.ticket_number,
+                    )
+            email = self.user.email
+        if self.state == 2:
+            context = ('You have been assigned ticket number {ticket_number}.'
+                    '\n\nThe Team').format(
+                            ticket_number=self.ticket_number,
+                    )
+            subject = ('You have been assigned ticket number {ticket_number}.'
+                    '\n\nThe Team').format(
+                            ticket_number=self.ticket_number,
+                    )
+            body = ('You have been assigned ticket number {ticket_number}.'
+                    '\n\nThe Team').format(
+                            ticket_number=self.ticket_number,
+                    )
+            email = self.staff.email
+
+        EmailManager(context,
+                subject=subject,
+                body=body,
+                from_email=settings.EMAIL_HOST_USER,
+                to=self.user.email,
+                bcc=email,
+                connection=None,
+                attachments=None,
+                headers=None,
+                alternatives=None,
+                cc=None,
+                reply_to=None
+            )
 
     def __unicode__(self):
         return u'{ticket_number} {user}'.format(

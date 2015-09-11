@@ -4,6 +4,7 @@ from datetime import timedelta
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.urlresolvers import reverse_lazy
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from django.views.generic import View
@@ -58,7 +59,10 @@ class Login_required_mixin(View):
 class TicketMixin(object):
     def get_queryset(self):
         if self.request.user.is_staff:
-            return Ticket.objects.all()
+            return Ticket.objects.filter(
+                    Q(state=1) |
+                    Q(staff=self.request.user)
+                    )
         return Ticket.objects.filter(user=self.request.user)
 
     def get_object(self):
@@ -70,7 +74,7 @@ class TicketCreate(ContextMixin, Login_required_mixin, CreateView):
     title = _('Edit ticket')
     model = Ticket
     fields = ['ticket_type', 'severity', 'description', 'attachment', ]
-    success_message = _('ticket was successfully created')
+    success_message = _('Ticket was successfully created')
     error_message = _('Please check the failures bellow')
     success_url = reverse_lazy('ticketList')
 
@@ -84,7 +88,7 @@ class TicketDelete(ContextMixin, Login_required_mixin, TicketMixin,
     title = _('Delete ticket')
     model = Ticket
     success_url = reverse_lazy('home')
-    success_message = _('ticket was successfully deleted')
+    success_message = _('Ticket was successfully deleted')
     success_url = reverse_lazy('ticketList')
 
 
@@ -93,7 +97,7 @@ class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
     title = _('Edit ticket')
     model = Ticket
     success_url = reverse_lazy('home')
-    success_message = _('ticket was successfully updated')
+    success_message = _('Ticket was successfully updated')
     success_url = reverse_lazy('ticketList')
 
     def get_form_class(self):
