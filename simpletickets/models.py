@@ -89,6 +89,7 @@ class Ticket(models.Model):
             delta = self.resolution_date - self.creation_date
             self.resolution_delta = int(delta.total_seconds())
         super(Ticket, self).save(*args, **kwargs)
+        # self._monitor()
         if not self.ticket_number:
             self.ticket_number = str(self.creation_date)[2:4] + (
                     '00000{id}'.format(id=self.id))[-6:]
@@ -97,6 +98,7 @@ class Ticket(models.Model):
         self._mailSender()
 
     def _mailSender(self):
+        context = ''
         if self.state == 9:
             context = ('We are glad we have solved your ticket number: '
                     '{ticket_number}\n\n'
@@ -116,6 +118,7 @@ class Ticket(models.Model):
                             ticket_number=self.ticket_number,
                     )
             email = self.user.email
+            self.sendEmail(context, subject, body, email)
         if self.state == 2:
             context = ('You have been assigned ticket number {ticket_number}.'
                     '\n\nThe Team').format(
@@ -130,7 +133,9 @@ class Ticket(models.Model):
                             ticket_number=self.ticket_number,
                     )
             email = self.staff.email
+            self.sendEmail(context, subject, body, email)
 
+    def sendEmail(self, context, subject, body, email):
         EmailManager(context,
                 subject=subject,
                 body=body,
@@ -144,6 +149,18 @@ class Ticket(models.Model):
                 cc=None,
                 reply_to=None
             )
+
+    # def monitorfile(self):
+    #     return os.path.join(settings.MEDIA_ROOT, 'simpletickets',
+    #         '{id}-{user}-{date}.mon'.format(
+    #                 id=self.id,
+    #                 user=self.user,
+    #                 date=self.creation_date.strftime('%y%m%d'),
+    #             ))
+
+    # def _monitor(self):
+    #     with open(self.monitorfile()) as monitor:
+    #         print monitor
 
     def __unicode__(self):
         return u'{ticket_number} {user}'.format(
