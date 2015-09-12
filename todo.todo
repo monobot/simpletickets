@@ -1,0 +1,15 @@
+Things to do:
+    ☐ config file
+    ☐ better explanation
+    ☐ package creation
+    ☐ ROLES
+        ticket_agent
+        ticket_mng
+    ☐ TEST
+        ☐ models
+            helpers
+            methods
+        ☐ views
+    ☐ decorate function on ticket save
+        drafted
+    ☐ REST
