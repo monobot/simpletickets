@@ -48,10 +48,15 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% ifequal ticket.severity 1 %}<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>{% endifequal %}
-                                {% ifequal ticket.severity 2 %}<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>{% endifequal %}
-                                {% ifequal ticket.severity 3 %}<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>{% endifequal %}
-                                {% ifequal ticket.severity 4 %}<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>{% endifequal %}
+                                {% if ticket.severity > 2 %}
+                                    {% ifequal ticket.severity 9 %}
+                                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                    {% else %}
+                                        <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                    {% endifequal %}
+                                {% endif %}
+                                {% ifequal ticket.severity 2 %}<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>{% endifequal %}
+                                {% ifequal ticket.severity 1 %}<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>{% endifequal %}
                                 {{ ticket.get_severity_display }}
                             </td>
                             <td>

@@ -11,19 +11,21 @@ TICKET_ATTACHMENTS = getattr(settings, 'TICKET_ATTACHMENTS',
         os.path.join(settings.MEDIA_ROOT, 'tickets'))
 
 DELTA_CLOSE = getattr(settings, 'DELTA_CLOSE', timedelta(hours=12))
+DELTA_CLOSE = getattr(settings, 'DELTA_CLOSE', timedelta(minutes=1))
 
 TICKET_TYPE = getattr(settings, 'TICKET_TYPE', (
         (1, _(u'Inform about an error')),
         (2, _(u'Problem')),
         (3, _(u'Propose a sugestion')),
-        (4, _(u'Others')),
+        (9, _(u'Others')),
         ))
 
 TICKET_SEVERITY = getattr(settings, 'TICKET_SEVERITY', (
-        (1, _(u'Critical')),
-        (2, _(u'Very important')),
-        (3, _(u'Important')),
-        (4, _(u'Normal')),
+        (1, _(u'Low')),
+        (2, _(u'Normal')),
+        (5, _(u'important')),
+        (8, _(u'very important')),
+        (9, _(u'Critical')),
         ))
 
 TICKET_STATE = getattr(settings, 'TICKET_STATE', (

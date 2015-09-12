@@ -37,12 +37,12 @@ class ContextMixin(SuccessMessageMixin, View):
             context['porc_solved'] = 100
             context['porc_pending'] = 0
 
-        if all_tickets.filter(state__gt=2):
-            context['fastest'] = all_tickets.filter(state__gt=2).order_by(
+        if all_tickets.filter(state__gt=7):
+            context['fastest'] = all_tickets.filter(state__gt=7).order_by(
                     'resolution_delta')[0].humanized_delta()
             context['media'] = timedelta(seconds=sum(
                     [t.resolution_delta for t in all_tickets.filter(
-                            state__gt=2)]) / n_solved
+                            state__gt=7)]) / n_solved
                     )
 
         return context
@@ -100,13 +100,12 @@ class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
     success_message = _('Ticket was successfully updated')
     success_url = reverse_lazy('ticketList')
 
-    def getHeaders(self, date, user):
-        header_msg = _('**** Edited on {date} by {user}\n').format(
+    def getHeader(self, date, user):
+        header_msg = _('** {date} [{user}]: ').format(
                 date=date,
                 user=user,
             )
-        tail_msg = _('**** End with edition\n')
-        return header_msg, tail_msg
+        return header_msg
 
     def get_form_class(self):
         if self.request.user.is_staff:
@@ -115,7 +114,7 @@ class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
 
     def form_valid(self, form):
         ticket = form.instance
-        header_msg, tail_msg = self.getHeaders(
+        header_msg = self.getHeader(
                 ticket.creation_date,
                 self.request.user.username
             )
@@ -127,9 +126,7 @@ class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
             ticket.resolution_delta = None
 
         monitor(monitorfile(ticket), header_msg)
-        creationobject = super(TicketUpdate, self).form_valid(form)
-        monitor(monitorfile(ticket), tail_msg)
-        return creationobject
+        return super(TicketUpdate, self).form_valid(form)
 
 
 class TicketList(ContextMixin, Login_required_mixin, TicketMixin, ListView):
