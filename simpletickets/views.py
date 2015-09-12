@@ -13,7 +13,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from models import Ticket
 from forms import TicketFormUser, TicketFormStaff
-from settings import BASE_TEMPLATE
+from settings import BASE_TEMPLATE, monitor, monitorfile
 
 
 # MIXINS
@@ -100,6 +100,14 @@ class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
     success_message = _('Ticket was successfully updated')
     success_url = reverse_lazy('ticketList')
 
+    def getHeaders(self, date, user):
+        header_msg = _('**** Edited on {date} by {user}\n').format(
+                date=date,
+                user=user,
+            )
+        tail_msg = _('**** End with edition\n')
+        return header_msg, tail_msg
+
     def get_form_class(self):
         if self.request.user.is_staff:
             return TicketFormStaff
@@ -107,13 +115,21 @@ class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
 
     def form_valid(self, form):
         ticket = form.instance
+        header_msg, tail_msg = self.getHeaders(
+                ticket.creation_date,
+                self.request.user.username
+            )
         if not ticket.staff and self.request.user.is_staff:
             ticket.staff = self.request.user
         if not self.request.user.is_staff and ticket.state == 8:
             ticket.state = 2
             ticket.resolution_date = None
             ticket.resolution_delta = None
-        return super(TicketUpdate, self).form_valid(form)
+
+        monitor(monitorfile(ticket), header_msg)
+        creationobject = super(TicketUpdate, self).form_valid(form)
+        monitor(monitorfile(ticket), tail_msg)
+        return creationobject
 
 
 class TicketList(ContextMixin, Login_required_mixin, TicketMixin, ListView):

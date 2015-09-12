@@ -33,3 +33,17 @@ TICKET_STATE = getattr(settings, 'TICKET_STATE', (
         (8, _(u'solved')),
         (9, _(u'closed')),
         ))
+
+
+def monitorfile(ticket):
+    return os.path.join(settings.MEDIA_ROOT, 'simpletickets',
+            '{id}-{user}-{date}.mon'.format(
+                id=ticket.id,
+                user=ticket.user,
+                date=ticket.creation_date.strftime('%y%m%d'),
+            ))
+
+
+def monitor(myfilename, msg):
+    with open(myfilename, 'a') as monitor:
+        monitor.write(msg)

@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as ugl
 from django.conf import settings
 
 from settings import (TICKET_ATTACHMENTS, DELTA_CLOSE, TICKET_TYPE,
-        TICKET_SEVERITY, TICKET_STATE)
+        TICKET_SEVERITY, TICKET_STATE, monitor, monitorfile)
 
 from simpleemail.email_helper import EmailManager
 
@@ -78,8 +78,21 @@ class Ticket(models.Model):
     def humanized_delta(self):
         return self.resolution_date - self.creation_date
 
+    def _saveMonitor(self, func):
+        header_msg, tail_msg = None, None
+        if not self.id:
+            header_msg = (_('#### Ticket created at {date}\n')
+                    ).format(date=self.creation_date)
+            tail_msg = _('#### End creation\n')
+
+        def func():
+            pass
+        print header_msg, tail_msg
+
     def save(self, *args, **kwargs):
         self.modification_date = timezone.now()
+        if self.id:
+            self.changesChecker(Ticket.objects.get(id=self.id), self)
         if self.state == 1:
             if self.staff:
                 self.state = 2
@@ -89,18 +102,27 @@ class Ticket(models.Model):
             delta = self.resolution_date - self.creation_date
             self.resolution_delta = int(delta.total_seconds())
         super(Ticket, self).save(*args, **kwargs)
-        # self._monitor()
+        # if header_msg:
+        #     monitor(monitorfile(self), header_msg)
         if not self.ticket_number:
             self.ticket_number = str(self.creation_date)[2:4] + (
                     '00000{id}'.format(id=self.id))[-6:]
             self.save()
-
+        # if tail_msg:
+        #     monitor(monitorfile(self), tail_msg)
         self._mailSender()
 
     def _mailSender(self):
         context = ''
         if self.state == 9:
-            context = ('We are glad we have solved your ticket number: '
+            context = _('Your {ticket_number} has been solved!').format(
+                            ticket_number=self.ticket_number,
+                    )
+            subject = _('Your ticket number {ticket_number} has been solved'
+                    ).format(
+                            ticket_number=self.ticket_number,
+                    )
+            body = _('We are glad we have solved your ticket number: '
                     '{ticket_number}\n\n'
                     'The resolution time was {resolution_delta}.\n\n'
                     'You have {DELTA_CLOSE} hours to reopen it, '
@@ -110,30 +132,44 @@ class Ticket(models.Model):
                             resolution_delta=self.resolution_delta,
                             DELTA_CLOSE=DELTA_CLOSE,
                     )
-            subject = ('Your ticket number {ticket_number} has been solved'
-                    ).format(
-                            ticket_number=self.ticket_number,
-                    )
-            body = ('Your {ticket_number} has been solved!').format(
-                            ticket_number=self.ticket_number,
-                    )
             email = self.user.email
             self.sendEmail(context, subject, body, email)
         if self.state == 2:
-            context = ('You have been assigned ticket number {ticket_number}.'
+            context = _('You have been assigned ticket number {ticket_number}.'
                     '\n\nThe Team').format(
                             ticket_number=self.ticket_number,
                     )
-            subject = ('You have been assigned ticket number {ticket_number}.'
+            subject = _('Ticket {ticket_number} assigned.'
                     '\n\nThe Team').format(
                             ticket_number=self.ticket_number,
                     )
-            body = ('You have been assigned ticket number {ticket_number}.'
+            body = _('You have been assigned ticket number {ticket_number}.'
                     '\n\nThe Team').format(
                             ticket_number=self.ticket_number,
                     )
             email = self.staff.email
             self.sendEmail(context, subject, body, email)
+
+    def changesChecker(self, original, actual):
+        MONITORIZED = ['ticket_number', 'user', 'staff', 'ticket_type',
+                'severity', 'state', 'description',
+                'resolution_text']
+        msg = ''
+        for attribute in MONITORIZED:
+            attr_ori = getattr(original, attribute)
+            attr_act = getattr(actual, attribute)
+            value = attr_act
+            if attribute in ['ticket_type', 'severity', 'state']:
+                value = getattr(actual, 'get_{attribute}_display'.format(
+                        attribute=attribute)
+                )()
+            if not attr_ori == attr_act and (attr_ori or attr_act):
+                msg += '[{attrname}]: {attrvalue} | '.format(
+                        attrname=attribute.upper(),
+                        attrvalue=value,
+                    )
+        msg += '\n'
+        monitor(monitorfile(self), msg)
 
     def sendEmail(self, context, subject, body, email):
         EmailManager(context,
@@ -149,18 +185,6 @@ class Ticket(models.Model):
                 cc=None,
                 reply_to=None
             )
-
-    # def monitorfile(self):
-    #     return os.path.join(settings.MEDIA_ROOT, 'simpletickets',
-    #         '{id}-{user}-{date}.mon'.format(
-    #                 id=self.id,
-    #                 user=self.user,
-    #                 date=self.creation_date.strftime('%y%m%d'),
-    #             ))
-
-    # def _monitor(self):
-    #     with open(self.monitorfile()) as monitor:
-    #         print monitor
 
     def __unicode__(self):
         return u'{ticket_number} {user}'.format(
