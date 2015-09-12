@@ -10,7 +10,8 @@ from django.utils.translation import ugettext_lazy as ugl
 from django.conf import settings
 
 from settings import (TICKET_ATTACHMENTS, DELTA_CLOSE, TICKET_TYPE,
-        TICKET_SEVERITY, TICKET_STATE, monitor, monitorfile)
+        TICKET_SEVERITY, TICKET_STATE, )
+from helpers import monitor, monitorfile
 
 from simpleemail.email_helper import EmailManager
 

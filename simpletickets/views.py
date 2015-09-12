@@ -13,7 +13,10 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from models import Ticket
 from forms import TicketFormUser, TicketFormStaff
-from settings import BASE_TEMPLATE, monitor, monitorfile
+from settings import (BASE_TEMPLATE, TICKET_MNTR_OWNER, TICKET_MNTR_STAFF,
+        STATISTIC_NUMBERS_STAFF, STATISTIC_TIMES_STAFF,
+        STATISTIC_NUMBERS_OWNER, STATISTIC_TIMES_OWNER)
+from helpers import monitor, monitorfile
 
 
 # MIXINS
@@ -22,29 +25,57 @@ class ContextMixin(SuccessMessageMixin, View):
         context = super(ContextMixin, self).get_context_data(**kwargs)
         context['title'] = self.title
         context['base_template'] = BASE_TEMPLATE
+        context['ticket_mntr_owner'] = TICKET_MNTR_OWNER
+        context['ticket_mntr_staff'] = TICKET_MNTR_STAFF
 
         all_tickets = Ticket.objects.all()
         n_solved = Ticket.objects.n_solved()
         n_total = Ticket.objects.n_total()
+        context['statistic_numbers_staff'] = STATISTIC_NUMBERS_STAFF
+        context['statistic_numbers_owner'] = STATISTIC_NUMBERS_OWNER
+        context['statistic_times_staff'] = STATISTIC_TIMES_STAFF
+        context['statistic_times_owner'] = STATISTIC_TIMES_OWNER
 
-        if n_solved and n_total:
-            context['porc_solved'] = n_solved * 100 / n_total
-            context['porc_pending'] = 100 - context['porc_solved']
-        elif n_total:
-            context['porc_solved'] = 0
-            context['porc_pending'] = 100
+        if self.request.user.is_staff:
+            if STATISTIC_NUMBERS_STAFF:
+                if n_solved and n_total:
+                    context['porc_solved'] = n_solved * 100 / n_total
+                    context['porc_pending'] = 100 - context['porc_solved']
+                elif n_total:
+                    context['porc_solved'] = 0
+                    context['porc_pending'] = 100
+                else:
+                    context['porc_solved'] = 100
+                    context['porc_pending'] = 0
+            if STATISTIC_TIMES_STAFF:
+                if all_tickets.filter(state__gt=7):
+                    context['fastest'] = all_tickets.filter(state__gt=7
+                            ).order_by('resolution_delta'
+                        )[0].humanized_delta()
+                    context['media'] = timedelta(seconds=sum(
+                            [t.resolution_delta for t in all_tickets.filter(
+                                    state__gt=7)]) / n_solved
+                        )
         else:
-            context['porc_solved'] = 100
-            context['porc_pending'] = 0
-
-        if all_tickets.filter(state__gt=7):
-            context['fastest'] = all_tickets.filter(state__gt=7).order_by(
-                    'resolution_delta')[0].humanized_delta()
-            context['media'] = timedelta(seconds=sum(
-                    [t.resolution_delta for t in all_tickets.filter(
-                            state__gt=7)]) / n_solved
-                    )
-
+            if STATISTIC_NUMBERS_OWNER:
+                if n_solved and n_total:
+                    context['porc_solved'] = n_solved * 100 / n_total
+                    context['porc_pending'] = 100 - context['porc_solved']
+                elif n_total:
+                    context['porc_solved'] = 0
+                    context['porc_pending'] = 100
+                else:
+                    context['porc_solved'] = 100
+                    context['porc_pending'] = 0
+            if STATISTIC_TIMES_OWNER:
+                if all_tickets.filter(state__gt=7):
+                    context['fastest'] = all_tickets.filter(state__gt=7
+                            ).order_by('resolution_delta'
+                        )[0].humanized_delta()
+                    context['media'] = timedelta(seconds=sum(
+                            [t.resolution_delta for t in all_tickets.filter(
+                                    state__gt=7)]) / n_solved
+                        )
         return context
 
 

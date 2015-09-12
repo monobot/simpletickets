@@ -31,43 +31,92 @@
             </div>
         </div>{# div .rov #}
         <div class="row">
-            <div class="col-xl-4 col-md-6 col-xs-12">
-                <div class="col-md-12">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Resolution times</h3>
-                        </div>
-                        <div class="panel-body">
-                            <p>Fastest: {{ fastest }}</p>
-                            <p>Media: {{ media }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>{# div .col-xl-4 col-md-6 col-xs-12 #}
-            <div class="col-xl-4 col-md-6 col-xs-12">
-                <div class="col-md-12">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Tickets statistics</h3>
-                        </div>{# div .panel-heading #}
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-xl-6 col-md-6 col-xs-12"><p>Solved vs pending tickets </p></div>
-                                <div class="col-xl-6 col-md-6 col-xs-12">
-                                    <div class="progress">
-                                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ porc_solved }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ porc_solved }}%">
-                                        {{ porc_solved }}%
-                                        </div>
-                                        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{ porc_pending }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ porc_pending }}%">
-                                        {{ porc_pending }}%
-                                        </div>
+                {% if user.is_staff %}
+                    {% if statistic_times_staff %}
+                        <div class="col-xl-4 col-md-6 col-xs-12">
+                            <div class="col-md-12">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Resolution times</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <p>Fastest: {{ fastest }}</p>
+                                        <p>Media: {{ media }}</p>
                                     </div>
                                 </div>
                             </div>
-                        </div>{# div .panel-body #}
-                    </div>
-                </div>
-            </div>{# div .col-xl-4 col-md-6 col-xs-12 #}
+                        </div>{# div .col-xl-4 col-md-6 col-xs-12 #}
+                    {% endif %}
+                    {% if statistic_numbers_staff %}
+                        <div class="col-xl-4 col-md-6 col-xs-12">
+                            <div class="col-md-12">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Tickets statistics</h3>
+                                    </div>{# div .panel-heading #}
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-xl-6 col-md-6 col-xs-12"><p>Solved vs pending tickets </p></div>
+                                            <div class="col-xl-6 col-md-6 col-xs-12">
+                                                <div class="progress">
+                                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ porc_solved }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ porc_solved }}%">
+                                                    {{ porc_solved }}%
+                                                    </div>
+                                                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{ porc_pending }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ porc_pending }}%">
+                                                    {{ porc_pending }}%
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>{# div .panel-body #}
+                                </div>
+                            </div>
+                        </div>{# div .col-xl-4 col-md-6 col-xs-12 #}
+                    {% endif %}
+                {% else %}
+                    {% if statistic_times_owner %}
+                        <div class="col-xl-4 col-md-6 col-xs-12">
+                            <div class="col-md-12">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Resolution times</h3>
+                                    </div>
+                                    <div class="panel-body">
+                                        <p>Fastest: {{ fastest }}</p>
+                                        <p>Media: {{ media }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>{# div .col-xl-4 col-md-6 col-xs-12 #}
+                    {% endif %}
+                    {% if statistic_numbers_owner %}
+                        <div class="col-xl-4 col-md-6 col-xs-12">
+                            <div class="col-md-12">
+                                <div class="panel panel-primary">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Tickets statistics</h3>
+                                    </div>{# div .panel-heading #}
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-xl-6 col-md-6 col-xs-12"><p>Solved vs pending tickets </p></div>
+                                            <div class="col-xl-6 col-md-6 col-xs-12">
+                                                <div class="progress">
+                                                    <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ porc_solved }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ porc_solved }}%">
+                                                    {{ porc_solved }}%
+                                                    </div>
+                                                    <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="{{ porc_pending }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ porc_pending }}%">
+                                                    {{ porc_pending }}%
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>{# div .panel-body #}
+                                </div>
+                            </div>
+                        </div>{# div .col-xl-4 col-md-6 col-xs-12 #}
+                    {% endif %}
+
+                {% endif %}
         </div>{# div .row #}
     </div>
 {% endblock simpletickets %}

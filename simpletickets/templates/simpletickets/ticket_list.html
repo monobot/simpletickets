@@ -38,6 +38,15 @@
                                     {% else %}
                                         <button disabled="disabled" type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
                                     {% endif %}
+                                    {% if user.is_staff %}
+                                        {% if ticket_mntr_staff %}
+                                            <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></button>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if ticket_mntr_owner %}
+                                            <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></button>
+                                        {% endif %}
+                                    {% endif %}
                                 </div>
                             </td>
                             <td>

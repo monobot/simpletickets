@@ -36,16 +36,11 @@ TICKET_STATE = getattr(settings, 'TICKET_STATE', (
         (9, _(u'closed')),
         ))
 
+TICKET_MNTR_STAFF = getattr(settings, 'TICKET_MNTR_STAFF', True)
+TICKET_MNTR_OWNER = getattr(settings, 'TICKET_MNTR_OWNER', False)
 
-def monitorfile(ticket):
-    return os.path.join(settings.MEDIA_ROOT, 'simpletickets',
-            '{id}-{user}-{date}.mon'.format(
-                id=ticket.id,
-                user=ticket.user,
-                date=ticket.creation_date.strftime('%y%m%d'),
-            ))
+STATISTIC_TIMES_STAFF = getattr(settings, 'STATISTIC_TIMES_STAFF', True)
+STATISTIC_NUMBERS_STAFF = getattr(settings, 'STATISTIC_NUMBERS_STAFF', True)
 
-
-def monitor(myfilename, msg):
-    with open(myfilename, 'a') as monitor:
-        monitor.write(msg)
+STATISTIC_TIMES_OWNER = getattr(settings, 'STATISTIC_TIMES_OWNER', True)
+STATISTIC_NUMBERS_OWNER = getattr(settings, 'STATISTIC_NUMBERS_OWNER', True)
