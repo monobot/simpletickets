@@ -10,13 +10,13 @@ BASE_TEMPLATE = getattr(settings, 'BASE_TEMPLATE', 'index.html')
 TICKET_ATTACHMENTS = getattr(settings, 'TICKET_ATTACHMENTS',
         os.path.join(settings.MEDIA_ROOT, 'tickets'))
 
-DELTA_CLOSE = getattr(settings, 'DELTA_CLOSE', timedelta(hours=12))
 DELTA_CLOSE = getattr(settings, 'DELTA_CLOSE', timedelta(minutes=1))
+DELTA_CLOSE = getattr(settings, 'DELTA_CLOSE', timedelta(hours=6))
 
 TICKET_TYPE = getattr(settings, 'TICKET_TYPE', (
         (1, _(u'Inform about an error')),
         (2, _(u'Problem')),
-        (3, _(u'Propose a sugestion')),
+        (8, _(u'Propose a sugestion')),
         (9, _(u'Others')),
         ))
 
@@ -31,7 +31,7 @@ TICKET_SEVERITY = getattr(settings, 'TICKET_SEVERITY', (
 TICKET_STATE = getattr(settings, 'TICKET_STATE', (
         (1, _(u'new')),
         (2, _(u'assigned')),
-        (5, _(u'delayed')),
+        (5, _(u'in progress')),
         (8, _(u'solved')),
         (9, _(u'closed')),
         ))

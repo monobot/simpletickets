@@ -1,6 +1,6 @@
 Things to do:
     ☐ config file
-    ☐ better explanation
+        ✔ better explanation @done (15-09-12 23:28)
     ☐ package creation
     ☐ ROLES
         ticket_agent
@@ -10,6 +10,4 @@ Things to do:
             helpers
             methods
         ☐ views
-    ☐ decorate function on ticket save
-        drafted
     ☐ REST

@@ -14,38 +14,32 @@
                             <td>
                                 <div class="btn-group btn-group-xs" role="group" aria-label="ticket actions">
                                     {% if request.user.is_staff %}
-                                        <button disabled="disabled" type="button" class="btn btn-default">X</button>
+                                        <button disabled="disabled" type="button" class="btn btn-default" title="can't delete">X</button>
                                         {% if ticket.state < 8  %}
                                             <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
                                         {% else %}
-                                            <button disabled="disabled" type="button" class="btn btn-default">M</button>
+                                            <button disabled="disabled" type="button" class="btn btn-default" title="can't modify">M</button>
                                         {% endif %}
                                     {% else %}
                                         {% ifequal ticket.state 1 %}
                                             <a href="{% url 'TicketDelete' ticket.id %}" role="button" class="btn btn-danger" title="delete">X</a>
                                             <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
                                         {% else %}
-                                            <button disabled="disabled" type="button" class="btn btn-default">X</button>
+                                            <button disabled="disabled" type="button" class="btn btn-default" title="can't delete">X</button>
                                             {% ifequal ticket.state 8 %}
                                                 <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
                                             {% else %}
-                                                <button disabled="disabled" type="button" class="btn btn-default">M</button>
+                                                <button disabled="disabled" type="button" class="btn btn-default" title="can't modify">M</button>
                                             {% endifequal %}
                                         {% endifequal %}
                                     {% endif %}
                                     {% if ticket.attachment %}
-                                        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
+                                        <button type="button" class="btn btn-warning" title="attachment"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
                                     {% else %}
-                                        <button disabled="disabled" type="button" class="btn btn-default"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
+                                        <button disabled="disabled" type="button" class="btn btn-default" title="no attachment"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
                                     {% endif %}
-                                    {% if user.is_staff %}
-                                        {% if ticket_mntr_staff %}
-                                            <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></button>
-                                        {% endif %}
-                                    {% else %}
-                                        {% if ticket_mntr_owner %}
-                                            <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></button>
-                                        {% endif %}
+                                    {% if ticket_mntr %}
+                                        <button type="button" class="btn btn-info" title="monitor file"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></button>
                                     {% endif %}
                                 </div>
                             </td>
