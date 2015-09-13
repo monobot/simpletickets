@@ -114,7 +114,11 @@ TICKET_MNTR_STAFF = True
 TICKET_MNTR_OWNER = False
 ```
 
-The next 4 variables config if you want the statistic boxes to be showed for staff and/or owner.
+The next 5 variables config if you want the different boxes (main taskbar or the statistic) to be shown for staff and/or owner. If you are using your own templates simply ignore them.
+
+```python
+MAIN_TASKBAR = True
+```
 
 ```python
 STATISTIC_TIMES_STAFF = True

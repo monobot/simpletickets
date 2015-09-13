@@ -1,29 +1,31 @@
 {% extends base_template %}
 {% block simpletickets %}
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <nav class="navbar navbar-default">
-                    <div class="container-fluid">
-                        <div class="navbar-header">
-                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                                <span class="sr-only">Toggle navigation</span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                            </button>
-                            <a class="navbar-brand" href="#">Ticket system</a>
-                        </div>
-                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                            <ul class="nav navbar-nav">
-                                <button href="{% url 'ticketList' %}" type="button" class="btn btn-info navbar-btn">Tickets</button>
-                                <button href="{% url 'newTicket' %}" type="button" class="btn btn-success navbar-btn">New ticket</button>
-                            </ul>
-                        </div>
-                    </div>{# div .container-fluid #}
-                </nav>{# nav .navbar #}
-            </div>
-        </div>{# div .rov #}
+        {% if main_taskbar %}
+            <div class="row">
+                <div class="col-md-12">
+                    <nav class="navbar navbar-default">
+                        <div class="container-fluid">
+                            <div class="navbar-header">
+                                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                                    <span class="sr-only">Toggle navigation</span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </button>
+                                <a class="navbar-brand" href="#">Ticket system</a>
+                            </div>
+                            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                                <ul class="nav navbar-nav">
+                                    <button href="{% url 'ticketList' %}" type="button" class="btn btn-info navbar-btn">Tickets</button>
+                                    <button href="{% url 'newTicket' %}" type="button" class="btn btn-success navbar-btn">New ticket</button>
+                                </ul>
+                            </div>
+                        </div>{# div .container-fluid #}
+                    </nav>{# nav .navbar #}
+                </div>
+            </div>{# div .rov #}
+        {% endif %}
         <div class="row">
             <div class="col-md-12">
                 {% block tickets %}

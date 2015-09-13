@@ -39,6 +39,8 @@ TICKET_STATE = getattr(settings, 'TICKET_STATE', (
 TICKET_MNTR_STAFF = getattr(settings, 'TICKET_MNTR_STAFF', True)
 TICKET_MNTR_OWNER = getattr(settings, 'TICKET_MNTR_OWNER', False)
 
+MAIN_TASKBAR = getattr(settings, 'MAIN_TASKBAR', True)
+
 STATISTIC_TIMES_STAFF = getattr(settings, 'STATISTIC_TIMES_STAFF', True)
 STATISTIC_NUMBERS_STAFF = getattr(settings, 'STATISTIC_NUMBERS_STAFF', True)
 

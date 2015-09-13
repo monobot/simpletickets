@@ -10,7 +10,8 @@ from django.utils.translation import ugettext_lazy as ugl
 from django.conf import settings
 
 from settings import (TICKET_ATTACHMENTS, DELTA_CLOSE, TICKET_TYPE,
-        TICKET_SEVERITY, TICKET_STATE, )
+        TICKET_SEVERITY, TICKET_STATE,
+    )
 from helpers import monitor, monitorfile
 
 from simpleemail.email_helper import EmailManager
@@ -83,10 +84,13 @@ class Ticket(models.Model):
         self.modification_date = timezone.now()
         if self.id:
             header_msg = self.changesChecker(
-                    Ticket.objects.get(id=self.id), self)
+                    Ticket.objects.get(id=self.id),
+                    self
+                )
         else:
-            header_msg = (_('#### Ticket created at {date}\n')
-                    ).format(date=self.creation_date)
+            header_msg = _('#### Ticket created at {date}\n').format(
+                    date=self.creation_date,
+                )
         if self.state == 1:
             if self.staff:
                 self.state = 2
@@ -99,7 +103,8 @@ class Ticket(models.Model):
         monitor(monitorfile(self), header_msg)
         if not self.ticket_number:
             self.ticket_number = str(self.creation_date)[2:4] + (
-                    '00000{id}'.format(id=self.id))[-6:]
+                    '00000{id}'.format(id=self.id)
+                )[-6:]
             self.save()
 
     def _mailSender(self):
@@ -107,18 +112,16 @@ class Ticket(models.Model):
         if self.state == 9:
             context = {}
             subject = _('Your ticket number {ticket_number} has been solved'
-                    ).format(
-                            ticket_number=self.ticket_number,
-                    )
+                    ).format(ticket_number=self.ticket_number
+                        )
             body = _('We are glad we have solved your ticket number: '
                     '{ticket_number}\n\n'
                     'The resolution time was {resolution_delta}.\n\n'
                     'You have {DELTA_CLOSE} hours to reopen it, '
                     'remember to carefully explain your reasons.\nThe Team'
-                    ).format(
-                            ticket_number=self.ticket_number,
-                            resolution_delta=self.resolution_delta,
-                            DELTA_CLOSE=DELTA_CLOSE,
+                ).format(ticket_number=self.ticket_number,
+                        resolution_delta=self.resolution_delta,
+                        DELTA_CLOSE=DELTA_CLOSE
                     )
             email = self.user.email
             self.sendEmail(context, subject, body, email)
@@ -127,18 +130,19 @@ class Ticket(models.Model):
             subject = _('Ticket {ticket_number} assigned.'
                     '\n\nThe Team').format(
                             ticket_number=self.ticket_number,
-                    )
+                )
             body = _('You have been assigned ticket number {ticket_number}.'
                     '\n\nThe Team').format(
                             ticket_number=self.ticket_number,
-                    )
+                )
             email = self.staff.email
             self.sendEmail(context, subject, body, email)
 
     def changesChecker(self, original, actual):
         MONITORIZED = ['ticket_number', 'user', 'staff', 'ticket_type',
                 'severity', 'state', 'description',
-                'resolution_text']
+                'resolution_text'
+            ]
         msg = []
         for attribute in MONITORIZED:
             attr_ori = getattr(original, attribute)
@@ -147,7 +151,7 @@ class Ticket(models.Model):
             if attribute in ['ticket_type', 'severity', 'state']:
                 value = getattr(actual, 'get_{attribute}_display'.format(
                         attribute=attribute)
-                )()
+                    )()
             if not attr_ori == attr_act and (attr_ori or attr_act):
                 msg.append('[{attrname}]: {attrvalue}'.format(
                         attrname=attribute.upper(),
@@ -178,7 +182,7 @@ class Ticket(models.Model):
         return u'{ticket_number} {user}'.format(
                 ticket_number=self.ticket_number,
                 user=self.user,
-                )
+            )
 
     class Meta(object):
         verbose_name = _('Ticket')

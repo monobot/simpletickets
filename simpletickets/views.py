@@ -8,15 +8,16 @@ from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from django.views.generic import View
-from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.list import ListView
 
-from models import Ticket
+from models import Ticket  # noqa
 from forms import TicketFormUser, TicketFormStaff
+from helpers import monitor, monitorfile
 from settings import (BASE_TEMPLATE, TICKET_MNTR_OWNER, TICKET_MNTR_STAFF,
         STATISTIC_NUMBERS_STAFF, STATISTIC_NUMBERS_OWNER,
-        STATISTIC_TIMES_STAFF, STATISTIC_TIMES_OWNER)
-from helpers import monitor, monitorfile
+        STATISTIC_TIMES_STAFF, STATISTIC_TIMES_OWNER, MAIN_TASKBAR
+    )
 
 
 # MIXINS
@@ -34,6 +35,8 @@ class ContextMixin(SuccessMessageMixin, View):
             context['ticket_mntr'] = TICKET_MNTR_OWNER
             statistic_numbers = STATISTIC_NUMBERS_OWNER
             statistic_times = STATISTIC_TIMES_OWNER
+
+        context['main_taskbar'] = MAIN_TASKBAR
 
         if statistic_numbers:
             context['statistic_numbers'] = statistic_numbers
