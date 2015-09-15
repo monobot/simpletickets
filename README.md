@@ -22,7 +22,7 @@ Add simpletickets urls on one of your urls.py files:
 ```python
 urlpatterns = patterns('',
     ...
-    url(r'^tickets/', include('simpletickets.urls')),
+    url(r'^simpletickets/', include('simpletickets.urls')),
     )
 ```
 
@@ -38,6 +38,8 @@ There are some variables that can be set up in your settings file/s:
 ```python
 BASE_TEMPLATE = 'index.html'
 ```
+
+**TICKET_REST_API** boolean to select if you want a REST api, this feature uses django-restframework. so if activated you will need to install and set it up accordingly.
 
 **DELTA_CLOSE** is the timedelta lapse between the moment the ticket is marked as solved by an staff member until it changes to closed without the owner reopening it.
 

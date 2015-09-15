@@ -7,10 +7,14 @@ from django.utils.translation import ugettext as _
 
 BASE_TEMPLATE = getattr(settings, 'BASE_TEMPLATE', 'index.html')
 
-TICKET_ATTACHMENTS = getattr(settings, 'TICKET_ATTACHMENTS',
-        os.path.join(settings.MEDIA_ROOT, 'tickets'))
+TICKET_REST_API = getattr(settings, 'TICKET_REST_API', True)
 
-DELTA_CLOSE = getattr(settings, 'DELTA_CLOSE', timedelta(minutes=1))
+API_BASE_URL = getattr(settings, 'API_BASE_URL', 'api')
+
+TICKET_ATTACHMENTS = getattr(settings, 'TICKET_ATTACHMENTS',
+        os.path.join(settings.MEDIA_ROOT, 'tickets')
+    )
+
 DELTA_CLOSE = getattr(settings, 'DELTA_CLOSE', timedelta(hours=6))
 
 TICKET_TYPE = getattr(settings, 'TICKET_TYPE', (
@@ -18,7 +22,7 @@ TICKET_TYPE = getattr(settings, 'TICKET_TYPE', (
         (2, _(u'Problem')),
         (8, _(u'Propose a sugestion')),
         (9, _(u'Others')),
-        ))
+    ))
 
 TICKET_SEVERITY = getattr(settings, 'TICKET_SEVERITY', (
         (1, _(u'Low')),
@@ -26,7 +30,7 @@ TICKET_SEVERITY = getattr(settings, 'TICKET_SEVERITY', (
         (5, _(u'important')),
         (8, _(u'very important')),
         (9, _(u'Critical')),
-        ))
+    ))
 
 TICKET_STATE = getattr(settings, 'TICKET_STATE', (
         (1, _(u'new')),
@@ -34,7 +38,7 @@ TICKET_STATE = getattr(settings, 'TICKET_STATE', (
         (5, _(u'in progress')),
         (8, _(u'solved')),
         (9, _(u'closed')),
-        ))
+    ))
 
 TICKET_MNTR_STAFF = getattr(settings, 'TICKET_MNTR_STAFF', True)
 TICKET_MNTR_OWNER = getattr(settings, 'TICKET_MNTR_OWNER', False)

@@ -23,7 +23,7 @@ class EmailManager(EmailMultiAlternatives):
                 attachments, headers, cc, reply_to)
         self.alternatives = alternatives or []
         self.context = context
-        self.attachImages(['cabaana_logo.png', 'cabaana.png'])
+        # self.attachImages(['image1.png', 'image2.png'])
 
     def attachImages(self, imagenames):
         for image in imagenames:
