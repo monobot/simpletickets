@@ -27,7 +27,7 @@ class EmailManager(EmailMultiAlternatives):
 
     def attachImages(self, imagenames):
         for image in imagenames:
-            fp = open(os.path.join(os.path.dirname(__file__), '..', 'static',
+            fp = open(os.path.join(settings.MEDIA_ROOT,
                     image), 'rb')
             msg_img = MIMEImage(fp.read())
             fp.close()
@@ -38,20 +38,3 @@ class EmailManager(EmailMultiAlternatives):
         html_content = render_to_string(template, context)
         self.attach_alternative(html_content, "text/html")
         self.mixed_subtype = 'related'
-
-if __name__ == '__main__':
-    import django
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
-    django.setup()
-
-    subject = u'Account activation - Cabaana'
-    context = {'title': 'prueba cabaana',
-            'subtitle1': 'esto es una prueba cabaana'}
-
-    email = EmailManager(context,
-            subject=subject,
-            body='emails/register.txt',
-            to=['hector.aa@gmail.com', ],
-            )
-    email.attachHtml('emails/register.html', context)
-    email.send()
