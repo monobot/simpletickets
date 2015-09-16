@@ -8,6 +8,10 @@ from simpletickets.settings.ticketSettings import (TICKET_REST_API,
         API_BASE_URL
     )  # noqa
 
+from api.views import (UserTicketListCreate, UserTicketUpdateDelete,
+        StaffTicketList, StaffTicketUpdate
+    )
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -23,5 +27,24 @@ urlpatterns = patterns('',
 
 if TICKET_REST_API:
     urlpatterns += patterns('',
-        url(r'^{url}/'.format(url=API_BASE_URL), include('api.urls')),
+            url(r'^{url}/list-create/$'.format(url=API_BASE_URL),
+                    UserTicketListCreate.as_view(),
+                    name='apiListCreate'
+                ),
+            url(r'^{url}/ticket-(?P<pk>[\d]+)-update-destroy/$'.format(
+                    url=API_BASE_URL
+                ),
+                    UserTicketUpdateDelete.as_view(),
+                    name='updateDestroyCreate'
+                ),
+            url(r'^{url}/staff-list/$'.format(url=API_BASE_URL),
+                    StaffTicketList.as_view(),
+                    name='apiListCreate'
+                ),
+            url(r'^{url}/staff-ticket-(?P<pk>[\d]+)-update/$'.format(
+                    url=API_BASE_URL
+                ),
+                    StaffTicketUpdate.as_view(),
+                    name='updateDestroyCreate'
+                ),
         )

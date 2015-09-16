@@ -3,11 +3,14 @@ Things to do:
         ✔ better explanation @done (15-09-12 23:28)
     ☐ package creation
     ☐ ROLES
-        ticket_agent
-        ticket_mng
+        ☐ ticket_agent
+        ☐ ticket_mng
     ☐ TEST
         ☐ models
-            helpers
-            methods
+            ☐ helpers
+            ☐ methods
         ☐ views
     ☐ REST
+        ☐ serializers
+        ☐ permissions
+        ☐ views
