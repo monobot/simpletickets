@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import os
 
-from django.conf import settings
+from .settings import ST_ATTACHMENTS
 
 
 def monitorfile(ticket):
     return os.path.join(
-        settings.MEDIA_ROOT,
-        'simpletickets',
-        '{id}-{user}-{date}.mon'.format(
+        ST_ATTACHMENTS,
+        'monitors',
+        '{id}-{user}.mon'.format(
             id=ticket.id,
             user=ticket.user,
-            date=ticket.creation_date.strftime('%y%m%d'),
             )
         )
 

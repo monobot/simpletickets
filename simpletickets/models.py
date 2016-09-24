@@ -148,7 +148,7 @@ class Ticket(models.Model):
                     )()
             if not attr_ori == attr_act and (attr_ori or attr_act):
                 msg.append(
-                    '[{attrname}]: {attrvalue}'.format(
+                    '[{attrname}: {attrvalue}]'.format(
                         attrname=attribute.upper(),
                         attrvalue=value,
                         )
