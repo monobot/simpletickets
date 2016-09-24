@@ -1,4 +1,3 @@
 include LICENSE
 include README.md
-recursive-include simpletickets/locale *
-recursive-include simpletickets/templates *
+recursive-include simpletickets *
