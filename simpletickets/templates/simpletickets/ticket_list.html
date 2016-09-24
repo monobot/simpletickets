@@ -1,98 +1,112 @@
 {% extends 'simpletickets/tickets_base.html' %}
 {% block tickets %}
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h3 class="panel-title">Ticket list</h3>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-condensed">
-                <thead><tr><th>ticket</th><th>ACTIONS</th><th>state</th><th>severity</th><th>date</th><th>description</th></tr></thead>
-                <tbody>
-                {% for ticket in object_list %}
-                        <tr class="{% ifequal ticket.state 1 %}danger{% endifequal %}{% ifequal ticket.state 2 %}warning{% endifequal %}{% if ticket.state > 2 and ticket.state < 8 %}info{% endif %}{% ifequal ticket.state 8 %}success{% endifequal %}{% ifequal ticket.state 9 %}active{% endifequal %}">
-                            <td>{{ ticket.ticket_number }}</td>
-                            <td>
-                                <div class="btn-group btn-group-xs" role="group" aria-label="ticket actions">
-                                    {% if request.user.is_staff %}
-                                        <button disabled="disabled" type="button" class="btn btn-default" title="can't delete">X</button>
-                                        {% if ticket.state < 8  %}
-                                            <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
-                                        {% else %}
-                                            <button disabled="disabled" type="button" class="btn btn-default" title="can't modify">M</button>
-                                        {% endif %}
-                                    {% else %}
-                                        {% ifequal ticket.state 1 %}
-                                            <a href="{% url 'TicketDelete' ticket.id %}" role="button" class="btn btn-danger" title="delete">X</a>
-                                            <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
-                                        {% else %}
-                                            <button disabled="disabled" type="button" class="btn btn-default" title="can't delete">X</button>
-                                            {% ifequal ticket.state 8 %}
-                                                <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
-                                            {% else %}
-                                                <button disabled="disabled" type="button" class="btn btn-default" title="can't modify">M</button>
-                                            {% endifequal %}
-                                        {% endifequal %}
-                                    {% endif %}
-                                    {% if ticket.attachment %}
-                                        <button type="button" class="btn btn-warning" title="attachment"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
-                                    {% else %}
-                                        <button disabled="disabled" type="button" class="btn btn-default" title="no attachment"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
-                                    {% endif %}
-                                    {% if ticket_mntr %}
-                                        <button type="button" class="btn btn-info" title="monitor file"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></button>
-                                    {% endif %}
-                                </div>
-                            </td>
-                            <td>
-                                {% if user.is_staff %}
-                                    {{ ticket.staff }}
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Ticket list</h3>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>ticket</th>
+                    <th style="min-width:100px">actions</th>
+                    <th>
+                        {% if user.is_staff %}
+                            staff
+                        {% else %}
+                            state
+                        {% endif %}
+                    </th>
+                    <th>severity</th>
+                    <th>date</th>
+                    <th>description</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for ticket in object_list %}
+                <tr class="{% ifequal ticket.state 1 %}danger{% endifequal %}{% ifequal ticket.state 2 %}warning{% endifequal %}{% if ticket.state > 2 and ticket.state < 8 %}info{% endif %}{% ifequal ticket.state 8 %}success{% endifequal %}{% ifequal ticket.state 9 %}active{% endifequal %}">
+                    <td>{{ ticket.ticket_number }}</td>
+                    <td>
+                        <div class="btn-group btn-group-xs" role="group" aria-label="ticket actions">
+                            {% if request.user.is_staff %}
+                                <button disabled="disabled" type="button" class="btn btn-default" title="can't delete">X</button>
+                                {% if ticket.state < 8  %}
+                                    <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
                                 {% else %}
-                                    {{ ticket.get_state_display }}
+                                    <button disabled="disabled" type="button" class="btn btn-default" title="can't modify">M</button>
                                 {% endif %}
-                            </td>
-                            <td>
-                                {% if ticket.severity > 2 %}
-                                    {% ifequal ticket.severity 9 %}
-                                        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            {% else %}
+                                {% ifequal ticket.state 1 %}
+                                    <a href="{% url 'TicketDelete' ticket.id %}" role="button" class="btn btn-danger" title="delete">X</a>
+                                    <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
+                                {% else %}
+                                    <button disabled="disabled" type="button" class="btn btn-default" title="can't delete">X</button>
+                                    {% ifequal ticket.state 8 %}
+                                        <a href="{% url 'TicketUpdate' ticket.id %}" role="button" class="btn btn-primary" title="modify">M</a>
                                     {% else %}
-                                        <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                                        <button disabled="disabled" type="button" class="btn btn-default" title="can't modify">M</button>
                                     {% endifequal %}
-                                {% endif %}
-                                {% ifequal ticket.severity 2 %}<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>{% endifequal %}
-                                {% ifequal ticket.severity 1 %}<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>{% endifequal %}
-                                {{ ticket.get_severity_display }}
-                            </td>
-                            <td>
-                                {% if ticket.state > 7 %}
-                                    delayed for {{ ticket.humanized_delta }}
-                                {% else %}
-                                    {{ ticket.creation_date }}</td>
-                                {% endif %}
-                            <td>
-                                {% if ticket.state > 2 %}
-                                    {% if  ticket.state < 9 %}
-                                        {{ ticket.resolution_text }}
-                                    {% endif %}
-                                {% else %}
-                                    {{ ticket.description }}</td>
-                                {% endif %}
-                            </td>
-                        </tr>
-                {% endfor %}
-                {% if not request.user.is_staff %}
-                <tr><td>new ticket</td><td><div class="btn-group btn-group-xs" role="group"><a href="{% url 'newTicket' %}" role="button" class="btn btn-success" title="create">+</a></div></td><td></td><td></td><td></td><td></td></tr>
-                {% endif %}
-                </tbody>
-            </table>
-            <div class="panel-footer">
-                    <span>Leyend:</span>
-                    <span class="text-danger">new</span> |
-                    <span class="text-warning">asigned</span> |
-                    <span class="text-info">delayed</span> |
-                    <span class="text-success">solved</span> |
-                    <span class="text-active">closed</span> |
-                </div>
-            </div>
+                                {% endifequal %}
+                            {% endif %}
+                            {% if ticket.attachment %}
+                                <button type="button" class="btn btn-warning" title="attachment"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
+                            {% else %}
+                                <button disabled="disabled" type="button" class="btn btn-default" title="no attachment"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
+                            {% endif %}
+                            {% if ST_MNTR %}
+                                <button type="button" class="btn btn-info" title="monitor file"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></button>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        {% if user.is_staff %}
+                            {{ ticket.staff }}
+                        {% else %}
+                            {{ ticket.get_state_display }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if ticket.severity > 2 %}
+                            {% ifequal ticket.severity 9 %}
+                                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            {% else %}
+                                <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+                            {% endifequal %}
+                        {% endif %}
+                        {% ifequal ticket.severity 2 %}<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span>{% endifequal %}
+                        {% ifequal ticket.severity 1 %}<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>{% endifequal %}
+                        {{ ticket.get_severity_display }}
+                    </td>
+                    <td>
+                        {% if ticket.state > 7 %}
+                            delayed for {{ ticket.humanized_delta }}
+                        {% else %}
+                            {{ ticket.creation_date }}</td>
+                        {% endif %}
+                    <td>
+                        {% if ticket.state > 2 %}
+                            {% if  ticket.state < 9 %}
+                                {{ ticket.resolution_text }}
+                            {% endif %}
+                        {% else %}
+                            {{ ticket.description }}</td>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            {% if not request.user.is_staff %}
+            <tr><td>new ticket</td><td><div class="btn-group btn-group-xs" role="group"><a href="{% url 'newTicket' %}" role="button" class="btn btn-success" title="create">+</a></div></td><td></td><td></td><td></td><td></td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+        <div class="panel-footer">
+            <span>Leyend:</span>
+            <span class="text-danger">new</span> |
+            <span class="text-warning">asigned</span> |
+            <span class="text-info">delayed</span> |
+            <span class="text-success">solved</span> |
+            <span class="text-active">closed</span> |
         </div>
     </div>
+</div>
 {% endblock tickets %}

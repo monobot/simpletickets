@@ -11,12 +11,13 @@ from django.views.generic import View
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-from models import Ticket  # noqa
-from forms import TicketFormUser, TicketFormStaff
-from helpers import monitor, monitorfile
-from settings import (BASE_TEMPLATE, TICKET_MNTR_OWNER, TICKET_MNTR_STAFF,
-        STATISTIC_NUMBERS_STAFF, STATISTIC_NUMBERS_OWNER,
-        STATISTIC_TIMES_STAFF, STATISTIC_TIMES_OWNER, MAIN_TASKBAR
+from .models import Ticket  # noqa
+from .forms import TicketFormUser, TicketFormStaff
+from .helpers import monitor, monitorfile
+from .settings import (BASE_TEMPLATE, ST_FILEMNTR_OWNER,
+    ST_FILEMNTR_STAFF, ST_SETT_NUMBERS_STAFF,
+    ST_SETT_NUMBERS_OWNER, ST_SETT_TIMES_STAFF,
+    ST_SETT_TIMES_OWNER, ST_SETT_MAIN_TASKBAR
     )
 
 
@@ -28,15 +29,15 @@ class ContextMixin(SuccessMessageMixin, View):
         context['base_template'] = BASE_TEMPLATE
 
         if self.request.user.is_staff:
-            context['ticket_mntr'] = TICKET_MNTR_STAFF
-            statistic_numbers = STATISTIC_NUMBERS_STAFF
-            statistic_times = STATISTIC_TIMES_STAFF
+            context['ST_MNTR'] = ST_FILEMNTR_STAFF
+            statistic_numbers = ST_SETT_NUMBERS_STAFF
+            statistic_times = ST_SETT_TIMES_STAFF
         else:
-            context['ticket_mntr'] = TICKET_MNTR_OWNER
-            statistic_numbers = STATISTIC_NUMBERS_OWNER
-            statistic_times = STATISTIC_TIMES_OWNER
+            context['ST_MNTR'] = ST_FILEMNTR_OWNER
+            statistic_numbers = ST_SETT_NUMBERS_OWNER
+            statistic_times = ST_SETT_TIMES_OWNER
 
-        context['main_taskbar'] = MAIN_TASKBAR
+        context['ST_SETT_MAIN_TASKBAR'] = ST_SETT_MAIN_TASKBAR
 
         if statistic_numbers:
             context['statistic_numbers'] = statistic_numbers
@@ -56,9 +57,10 @@ class ContextMixin(SuccessMessageMixin, View):
             all_tickets = Ticket.objects.all()
             if all_tickets.filter(state__gt=7):
                 context['fastest'] = all_tickets.filter(state__gt=7
-                        ).order_by('resolution_delta'
+                    ).order_by('resolution_delta'
                     )[0].humanized_delta()
-                context['media'] = timedelta(seconds=sum(
+                context['media'] = timedelta(
+                    seconds=sum(
                         [t.resolution_delta for t in all_tickets.filter(
                                 state__gt=7)]) / n_solved
                     )
@@ -69,7 +71,7 @@ class Login_required_mixin(View):
     @classmethod
     def as_view(self, **kwargs):
         return login_required(
-                super(Login_required_mixin, self).as_view(**kwargs)
+            super(Login_required_mixin, self).as_view(**kwargs)
             )
 
 
@@ -77,13 +79,13 @@ class TicketMixin(object):
     def get_queryset(self):
         if self.request.user.is_staff:
             return Ticket.objects.filter(
-                    Q(state=1) |
-                    Q(staff=self.request.user, state__lt=9)
+                Q(state=1) |
+                Q(staff=self.request.user, state__lt=9)
                 )
         return Ticket.objects.filter(user=self.request.user)
 
     def get_object(self):
-        return self.get_queryset().get(id=self.kwargs['ticket_id'])
+        return self.get_queryset().get(id=self.kwargs['ST_id'])
 # END MIXINS
 
 
@@ -118,10 +120,7 @@ class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
     success_url = reverse_lazy('ticketList')
 
     def getHeader(self, date, user):
-        header_msg = _('** {date} [{user}]: ').format(
-                date=date,
-                user=user,
-            )
+        header_msg = _('** {date} [{user}]: ').format(date=date, user=user)
         return header_msg
 
     def get_form_class(self):
@@ -132,8 +131,8 @@ class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
     def form_valid(self, form):
         ticket = form.instance
         header_msg = self.getHeader(
-                ticket.creation_date,
-                self.request.user.username
+            ticket.creation_date,
+            self.request.user.username
             )
         if not ticket.staff and self.request.user.is_staff:
             ticket.staff = self.request.user

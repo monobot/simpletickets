@@ -2,16 +2,16 @@
 from django.db.models import Q
 
 from rest_framework.generics import (ListCreateAPIView, ListAPIView,
-        RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
+    RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
     )  # noqa
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from simpletickets.api.permissions import (UserTicketPermission,
-        StaffTicketPermission
+    StaffTicketPermission
     )  # noqa
 from simpletickets.api.serializers import (UserTicketSerializer,
-        StaffTicketSerializer
+    StaffTicketSerializer
     )  # noqa
 from simpletickets.models import Ticket
 
@@ -26,12 +26,12 @@ class Custom20Pagination(PageNumberPagination):
 
     def get_paginated_response(self, data):
         return Response({
-                'links': {
-                   'next': self.get_next_link(),
+                'links': {'next': self.get_next_link(),
                    'previous': self.get_previous_link()
-                },
+                    },
                 'count': self.page.paginator.count,
-                'results': data}
+                'results': data
+                }
             )
 
 
@@ -77,8 +77,8 @@ class StaffTicketMixin(MainMixin):
 
     def get_queryset(self):
         return Ticket.objects.filter(
-                Q(state=1) |
-                Q(staff=self.request.user, state__lt=9)
+            Q(state=1) |
+            Q(staff=self.request.user, state__lt=9)
             )
 
     def perform_create(self, serializer):

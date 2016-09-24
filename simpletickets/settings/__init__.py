@@ -1,1 +1,1 @@
-from ticketSettings import *
+from .ticketSettings import *

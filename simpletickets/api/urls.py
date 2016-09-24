@@ -7,9 +7,7 @@ from simpletickets.api.views import UserTicketListCreate  # noqa
 
 
 urlpatterns = patterns(
-    url(r'^list/$',
-            UserTicketListCreate.as_view(), name='ticketListCreate'),
-
-)
+    url(r'^list/$', UserTicketListCreate.as_view(), name='ticketListCreate'),
+    )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

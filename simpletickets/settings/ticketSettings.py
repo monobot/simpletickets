@@ -7,46 +7,68 @@ from django.utils.translation import ugettext as _
 
 BASE_TEMPLATE = getattr(settings, 'BASE_TEMPLATE', 'index.html')
 
-TICKET_REST_API = getattr(settings, 'TICKET_REST_API', True)
+ST_REST_API = getattr(settings, 'ST_REST_API', True)
 
 API_BASE_URL = getattr(settings, 'API_BASE_URL', 'api')
 
-TICKET_ATTACHMENTS = getattr(settings, 'TICKET_ATTACHMENTS',
-        os.path.join(settings.MEDIA_ROOT, 'tickets')
+ST_ATTACHMENTS = getattr(settings, 'ST_ATTACHMENTS',
+    os.path.join(settings.MEDIA_ROOT, 'tickets')
     )
 
-DELTA_CLOSE = getattr(settings, 'DELTA_CLOSE', timedelta(hours=6))
+ST_DELTA_CLOSE = getattr(settings, 'ST_DELTA_CLOSE', timedelta(hours=6))
 
-TICKET_TYPE = getattr(settings, 'TICKET_TYPE', (
+ST_TCKT_TYPE = getattr(
+    settings,
+    'ST_TCKT_TYPE',
+    (
         (1, _(u'Inform about an error')),
         (2, _(u'Problem')),
         (8, _(u'Propose a sugestion')),
         (9, _(u'Others')),
-    ))
+        )
+    )
 
-TICKET_SEVERITY = getattr(settings, 'TICKET_SEVERITY', (
+ST_TCKT_SEVERITY = getattr(
+    settings,
+    'ST_TCKT_SEVERITY',
+    (
         (1, _(u'Low')),
         (2, _(u'Normal')),
         (5, _(u'important')),
         (8, _(u'very important')),
         (9, _(u'Critical')),
-    ))
+        )
+    )
 
-TICKET_STATE = getattr(settings, 'TICKET_STATE', (
+ST_TCKT_STATE = getattr(
+    settings,
+    'ST_TCKT_STATE',
+    (
         (1, _(u'new')),
         (2, _(u'assigned')),
         (5, _(u'in progress')),
         (8, _(u'solved')),
         (9, _(u'closed')),
-    ))
+        )
+    )
 
-TICKET_MNTR_STAFF = getattr(settings, 'TICKET_MNTR_STAFF', True)
-TICKET_MNTR_OWNER = getattr(settings, 'TICKET_MNTR_OWNER', False)
+ST_FILEMNTR_STAFF = getattr(settings, 'ST_FILEMNTR_STAFF', True)
+ST_FILEMNTR_OWNER = getattr(settings, 'ST_FILEMNTR_OWNER', False)
 
-MAIN_TASKBAR = getattr(settings, 'MAIN_TASKBAR', True)
+ST_SETT_MAIN_TASKBAR = getattr(
+    settings, 'ST_SETT_MAIN_TASKBAR', True
+    )
 
-STATISTIC_TIMES_STAFF = getattr(settings, 'STATISTIC_TIMES_STAFF', True)
-STATISTIC_NUMBERS_STAFF = getattr(settings, 'STATISTIC_NUMBERS_STAFF', True)
+ST_SETT_TIMES_STAFF = getattr(
+    settings, 'ST_SETT_TIMES_STAFF', True
+    )
+ST_SETT_NUMBERS_STAFF = getattr(
+    settings, 'ST_SETT_NUMBERS_STAFF', True
+    )
 
-STATISTIC_TIMES_OWNER = getattr(settings, 'STATISTIC_TIMES_OWNER', True)
-STATISTIC_NUMBERS_OWNER = getattr(settings, 'STATISTIC_NUMBERS_OWNER', True)
+ST_SETT_TIMES_OWNER = getattr(
+    settings, 'ST_SETT_TIMES_OWNER', True
+    )
+ST_SETT_NUMBERS_OWNER = getattr(
+    settings, 'ST_SETT_NUMBERS_OWNER', True
+    )

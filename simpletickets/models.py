@@ -9,16 +9,16 @@ from django.utils.translation import ugettext as _
 from django.utils.translation import ugettext_lazy as ugl
 from django.conf import settings
 
-from settings import (TICKET_ATTACHMENTS, DELTA_CLOSE, TICKET_TYPE,
-        TICKET_SEVERITY, TICKET_STATE,
+from .settings import (ST_ATTACHMENTS, ST_DELTA_CLOSE,
+    ST_TCKT_TYPE, ST_TCKT_SEVERITY, ST_TCKT_STATE,
     )
-from helpers import monitor, monitorfile
+from .helpers import monitor, monitorfile
 
-from simpleemail.email_helper import EmailManager
+from .simpleemail.email_helper import EmailManager
 
 
 def uploadAttachment(instance, filename):
-    return os.path.join(TICKET_ATTACHMENTS, filename)
+    return os.path.join(ST_ATTACHMENTS, filename)
 
 
 class TicketManager(models.Manager):
@@ -32,7 +32,7 @@ class TicketManager(models.Manager):
         all_objects = super(TicketManager, self).all()
         for obj in all_objects:
             if obj.state == 8 and (
-                    obj.resolution_date + DELTA_CLOSE <
+                    obj.resolution_date + ST_DELTA_CLOSE <
                     timezone.now()):
                 obj.state = 9
                 obj.save()
@@ -41,38 +41,34 @@ class TicketManager(models.Manager):
 
 class Ticket(models.Model):
     objects = TicketManager()
-    ticket_number = models.CharField(max_length=8,
-                blank=True,
-                null=True)
+    ticket_number = models.CharField(max_length=8, blank=True, null=True)
 
     user = models.ForeignKey(User,)
     staff = models.ForeignKey(User,
-            limit_choices_to={'is_staff': True},
-            related_name='usrStaff',
-            blank=True, null=True,
-            )
+        limit_choices_to={'is_staff': True},
+        related_name='usrStaff',
+        blank=True, null=True,
+        )
 
-    ticket_type = models.IntegerField(default=2, choices=TICKET_TYPE)
-    severity = models.IntegerField(default=3, choices=TICKET_SEVERITY)
-    state = models.IntegerField(default=1, choices=TICKET_STATE)
+    ticket_type = models.IntegerField(default=2, choices=ST_TCKT_TYPE)
+    severity = models.IntegerField(default=3, choices=ST_TCKT_SEVERITY)
+    state = models.IntegerField(default=1, choices=ST_TCKT_STATE)
 
-    description = models.TextField(ugl(u'Description'),
-            default='...')
+    description = models.TextField(ugl(u'Description'), default='...')
     attachment = models.FileField(upload_to=uploadAttachment,
-            blank=True, null=True)
+        blank=True, null=True)
 
-    resolution_text = models.TextField(ugl(u'Resolution text'),
-            default='')
+    resolution_text = models.TextField(ugl(u'Resolution text'), default='')
 
     creation_date = models.DateTimeField(_('Creation Date'),
-            default=timezone.now)
+        default=timezone.now)
     modification_date = models.DateTimeField(_('Last Modification Date'),
-            blank=True, null=True)
+        blank=True, null=True)
     resolution_date = models.DateTimeField(_('Resolution date'),
-            blank=True, null=True)
+        blank=True, null=True)
 
     resolution_delta = models.FloatField(_('delayed time in seconds'),
-            blank=True, null=True)
+        blank=True, null=True)
 
     def resolucion_tag(self):
         return mark_safe(self.resolution_text)
@@ -84,12 +80,12 @@ class Ticket(models.Model):
         self.modification_date = timezone.now()
         if self.id:
             header_msg = self.changesChecker(
-                    Ticket.objects.get(id=self.id),
-                    self
+                Ticket.objects.get(id=self.id),
+                self
                 )
         else:
             header_msg = _('#### Ticket created at {date}\n').format(
-                    date=self.creation_date,
+                date=self.creation_date,
                 )
         if self.state == 1:
             if self.staff:
@@ -103,7 +99,7 @@ class Ticket(models.Model):
         monitor(monitorfile(self), header_msg)
         if not self.ticket_number:
             self.ticket_number = str(self.creation_date)[2:4] + (
-                    '00000{id}'.format(id=self.id)
+                '00000{id}'.format(id=self.id)
                 )[-6:]
             self.save()
 
@@ -111,37 +107,35 @@ class Ticket(models.Model):
         context = ''
         if self.state == 9:
             context = {}
-            subject = _('Your ticket number {ticket_number} has been solved'
-                    ).format(ticket_number=self.ticket_number
-                        )
+            subject = _(
+                'Your ticket number {ticket_number} has been solved'
+                ).format(ticket_number=self.ticket_number)
             body = _('We are glad we have solved your ticket number: '
-                    '{ticket_number}\n\n'
-                    'The resolution time was {resolution_delta}.\n\n'
-                    'You have {DELTA_CLOSE} hours to reopen it, '
-                    'remember to carefully explain your reasons.\nThe Team'
+                '{ticket_number}\n\n'
+                'The resolution time was {resolution_delta}.\n\n'
+                'You have {ST_DELTA_CLOSE} hours to reopen it, '
+                'remember to carefully explain your reasons.\nThe Team'
                 ).format(ticket_number=self.ticket_number,
-                        resolution_delta=self.resolution_delta,
-                        DELTA_CLOSE=DELTA_CLOSE
+                    resolution_delta=self.resolution_delta,
+                    ST_DELTA_CLOSE=ST_DELTA_CLOSE
                     )
             email = self.user.email
             self.sendEmail(context, subject, body, email)
         if self.state == 2:
             context = {}
-            subject = _('Ticket {ticket_number} assigned.'
-                    '\n\nThe Team').format(
-                            ticket_number=self.ticket_number,
-                )
-            body = _('You have been assigned ticket number {ticket_number}.'
-                    '\n\nThe Team').format(
-                            ticket_number=self.ticket_number,
-                )
+            subject = _(
+                'Ticket {ticket_number} assigned.\n\nThe Team'
+                ).format(ticket_number=self.ticket_number)
+            body = _(
+                'You have been assigned ticket number {ticket_number}.'
+                '\n\nThe Team'
+                ).format(ticket_number=self.ticket_number)
             email = self.staff.email
             self.sendEmail(context, subject, body, email)
 
     def changesChecker(self, original, actual):
         MONITORIZED = ['ticket_number', 'user', 'staff', 'ticket_type',
-                'severity', 'state', 'description',
-                'resolution_text'
+            'severity', 'state', 'description', 'resolution_text'
             ]
         msg = []
         for attribute in MONITORIZED:
@@ -150,13 +144,15 @@ class Ticket(models.Model):
             value = attr_act
             if attribute in ['ticket_type', 'severity', 'state']:
                 value = getattr(actual, 'get_{attribute}_display'.format(
-                        attribute=attribute)
+                    attribute=attribute)
                     )()
             if not attr_ori == attr_act and (attr_ori or attr_act):
-                msg.append('[{attrname}]: {attrvalue}'.format(
+                msg.append(
+                    '[{attrname}]: {attrvalue}'.format(
                         attrname=attribute.upper(),
                         attrvalue=value,
-                    ))
+                        )
+                    )
         if msg:
             msg = ' | '.join(msg) + '\n'
         else:
@@ -165,23 +161,23 @@ class Ticket(models.Model):
 
     def sendEmail(self, context, subject, body, email):
         EmailManager(context,
-                subject=subject,
-                body=body,
-                from_email=settings.EMAIL_HOST_USER,
-                to=self.user.email,
-                bcc=email,
-                connection=None,
-                attachments=None,
-                headers=None,
-                alternatives=None,
-                cc=None,
-                reply_to=None
+            subject=subject,
+            body=body,
+            from_email=settings.EMAIL_HOST_USER,
+            to=self.user.email,
+            bcc=email,
+            connection=None,
+            attachments=None,
+            headers=None,
+            alternatives=None,
+            cc=None,
+            reply_to=None
             )
 
     def __unicode__(self):
         return u'{ticket_number} {user}'.format(
-                ticket_number=self.ticket_number,
-                user=self.user,
+            ticket_number=self.ticket_number,
+            user=self.user,
             )
 
     class Meta(object):

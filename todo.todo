@@ -1,10 +1,10 @@
 Things to do:
-    ☐ config file
-        ✔ better explanation @done (15-09-12 23:28)
+    ✔ config file
+        ✔ better explanation
     ☐ package creation
     ☐ ROLES
-        ☐ ticket_agent
-        ☐ ticket_mng
+        ☐ ST_agent
+        ☐ ST_mng
     ☐ TEST
         ☐ models
             ☐ helpers

@@ -19,8 +19,8 @@ class EmailManager(EmailMultiAlternatives):
 
         self.reply_to = reply_to or settings.EMAIL_HOST_USER
         super(EmailMultiAlternatives, self).__init__(
-                subject, txt_content, from_email, to, bcc, connection,
-                attachments, headers, cc, reply_to)
+            subject, txt_content, from_email, to, bcc, connection,
+            attachments, headers, cc, reply_to)
         self.alternatives = alternatives or []
         self.context = context
         # self.attachImages(['image1.png', 'image2.png'])
