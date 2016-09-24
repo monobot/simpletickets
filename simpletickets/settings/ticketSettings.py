@@ -11,8 +11,15 @@ ST_REST_API = getattr(settings, 'ST_REST_API', True)
 
 API_BASE_URL = getattr(settings, 'API_BASE_URL', 'api')
 
-ST_ATTACHMENTS = getattr(settings, 'ST_ATTACHMENTS',
-    os.path.join(settings.MEDIA_ROOT, 'tickets')
+MONITOR_FILES_DIR = 'monitors'
+ATTACHMENTS_DIR = 'tickets'
+
+ST_ATTACHMENTS = os.path.join(settings.MEDIA_ROOT, ATTACHMENTS_DIR)
+
+ST_ATTACH_URL = '{media_url}/{attachments_dir}/{monitor_files_dir}/'.format(
+    media_url=settings.MEDIA_URL,
+    attachments_dir=ATTACHMENTS_DIR,
+    monitor_files_dir=MONITOR_FILES_DIR,
     )
 
 ST_DELTA_CLOSE = getattr(settings, 'ST_DELTA_CLOSE', timedelta(hours=6))
@@ -52,8 +59,8 @@ ST_TCKT_STATE = getattr(
         )
     )
 
-ST_FILEMNTR_STAFF = getattr(settings, 'ST_FILEMNTR_STAFF', True)
-ST_FILEMNTR_OWNER = getattr(settings, 'ST_FILEMNTR_OWNER', False)
+ST_FL_MNTR_STAFF = getattr(settings, 'ST_FL_MNTR_STAFF', True)
+ST_FL_MNTR_OWNER = getattr(settings, 'ST_FL_MNTR_OWNER', False)
 
 ST_SETT_MAIN_TASKBAR = getattr(
     settings, 'ST_SETT_MAIN_TASKBAR', True

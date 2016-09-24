@@ -1,17 +1,14 @@
 # simpletickets
 
-This is a django module to manage ticketing between the users and the staff.
+This is a django plugin to manage ticketing between the users and the staff.
 In a simple, easy and usefull way.
 
----
-
-## Instalation
+# Installation and setup
 To install just
 ```bash
 pip install simpletickets
 ```
-
-## Module Set Up
+##### Module Set Up
 
 Add "simpletickets" to your installed apps:
 ```python
@@ -31,26 +28,18 @@ urlpatterns = patterns('',
     )
 ```
 
-- - -
+After the installation is completed and set up in your project, remember to migrate the database!
 
-## Module Config
+```bash
+python manage.py migrate
+```
 
-There are some variables that can be set up in your settings file/s:
+---
+# Module Config
+Simpletickets runs out of the box, but you can fine tune it to satisfy your project exact needings.
+
+To do do there are some variables that can be set up in your settings file/s:
 (The shown assigments are the default values)
-
-**BASE_TEMPLATE** is the base template where the tickets will be shown
-
-```python
-BASE_TEMPLATE = 'index.html'
-```
-
-there you __should have a template block named 'simpletickets'__
-```html
-{% block simpletickets %}
-{% endblock simpletickets %}
-```
-
-**ST_REST_API** boolean to select if you want a REST api, this feature uses django-restframework. so if activated you will need to install and set it up accordingly.
 
 **ST_DELTA_CLOSE** is the timedelta between the moment the ticket is marked as solved by an staff member until it changes to closed without the owner reopening it.
 
@@ -60,10 +49,24 @@ Once the item is closed it can not be reopened again, the user has to create a n
 ST_DELTA_CLOSE = timedelta(hours=6)
 ```
 
-**ST_ATTACHMENTS** is the folder where the ticket's attachments will be uploaded to
+**TICKET MONITOR**
+The ticket monitor is a supervision feature, there you can see all and every change the model object has sufered since created until finaly been closed.
+
+The next two variables config if you want the staff or the owner to be able to download this file for every ticket in their lists.
 
 ```python
-ST_ATTACHMENTS = os.path.join(settings.MEDIA_ROOT, 'tickets')
+ST_FL_MNTR_STAFF = True
+ST_FL_MNTR_OWNER = False
+```
+
+##### MODEL
+These are the configuration variables that modify the models in your system,
+Understand that ST_TCKT_TYPE, ST_TCKT_SEVERITY and ST_TCKT_STATE are modification of the database models and so in this case a migration will be needed!
+
+**ST_ATTACHMENTS** is the folder's name where the ticket's attachments will be uploaded to
+
+```python
+ATTACHMENTS_DIR = 'tickets'
 ```
 
 The next 3 configuration variables are the most commonly changed in the module, i have left some digits in the tuples empty by purpose, maybe this setup can work for 80% of the sites out there, but im sure you can fill up the voids with you special needs, feel free to do that in those blank spaces.
@@ -83,7 +86,6 @@ ST_TCKT_TYPE = (
     (9, _(u'Others')),
     )
 ```
-* Understand this setting is a modification in the database models and so migration will be needed!
 
 
 **ST_TCKT_SEVERITY** is as guessed the severity of the ticket from lowest priority to the higuest ones.
@@ -99,8 +101,6 @@ ST_TCKT_SEVERITY = (
     (9, _(u'Critical')),
     )
 ```
-* Understand this setting is a modification in the database models and so migration will be needed!
-
 
 **ST_TCKT_STATE**
 
@@ -121,19 +121,22 @@ ST_TCKT_STATE = (
     (9, _(u'closed')),
     )
 ```
-* Understand this setting is a modification in the database models and so migration will be needed!
 
-**TICKET MONITOR**
-The ticket monitor is a supervision feature, there you can see all and every change the model object has sufered since created until finaly been closed.
+##### TEMPLATE
+Currently simpletickets comes with a barebones version of twitter bootstrap, you can of course use your own templates, if so please ignore the next settings.
 
-The next two variables config if you want the staff or the owner to be able to download this file for every ticket in their lists.
+**BASE_TEMPLATE** is the base template where the tickets will be shown
 
 ```python
-ST_FILEMNTR_STAFF = True
-ST_FILEMNTR_OWNER = False
+BASE_TEMPLATE = 'index.html'
+```
+In that template there __should be a template block named 'simpletickets'__ where you want the tickets to be shown.
+```html
+{% block simpletickets %}
+{% endblock simpletickets %}
 ```
 
-The next 5 variables config if you want the different boxes (main taskbar or the statistic) to be shown for staff and/or owner. If you are using your own templates simply ignore them.
+The next 5 variables config if you want the different boxes (main taskbar or the statistic) to be shown for staff and/or owner.
 
 ```python
 ST_MAIN_TASKBAR = True

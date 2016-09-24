@@ -14,9 +14,8 @@ from django.views.generic.list import ListView
 from .models import Ticket  # noqa
 from .forms import TicketFormUser, TicketFormStaff
 from .helpers import monitor, monitorfile
-from .settings import (BASE_TEMPLATE, ST_FILEMNTR_OWNER,
-    ST_FILEMNTR_STAFF, ST_SETT_NUMBERS_STAFF,
-    ST_SETT_NUMBERS_OWNER, ST_SETT_TIMES_STAFF,
+from .settings import (BASE_TEMPLATE, ST_FL_MNTR_OWNER, ST_FL_MNTR_STAFF,
+    ST_SETT_NUMBERS_STAFF, ST_SETT_NUMBERS_OWNER, ST_SETT_TIMES_STAFF,
     ST_SETT_TIMES_OWNER, ST_SETT_MAIN_TASKBAR
     )
 
@@ -28,21 +27,17 @@ class ContextMixin(SuccessMessageMixin, View):
         context['title'] = self.title
         context['base_template'] = BASE_TEMPLATE
 
-        if self.request.user.is_staff:
-            context['ST_MNTR'] = ST_FILEMNTR_STAFF
-            statistic_numbers = ST_SETT_NUMBERS_STAFF
-            statistic_times = ST_SETT_TIMES_STAFF
-        else:
-            context['ST_MNTR'] = ST_FILEMNTR_OWNER
-            statistic_numbers = ST_SETT_NUMBERS_OWNER
-            statistic_times = ST_SETT_TIMES_OWNER
+        is_staff = self.request.user.is_staff
+        context['ST_MNTR'] = is_staff and ST_FL_MNTR_STAFF or ST_FL_MNTR_OWNER
+        stt_numb = is_staff and ST_SETT_NUMBERS_STAFF or ST_SETT_NUMBERS_OWNER
+        stt_times = is_staff and ST_SETT_TIMES_STAFF or ST_SETT_TIMES_OWNER
 
         context['ST_SETT_MAIN_TASKBAR'] = ST_SETT_MAIN_TASKBAR
 
-        if statistic_numbers:
-            context['statistic_numbers'] = statistic_numbers
-            n_solved = Ticket.objects.n_solved()
-            n_total = Ticket.objects.n_total()
+        if stt_numb:
+            context['stt_numb'] = stt_numb
+            n_solved = Ticket.objects.n_solved(self.request.user)
+            n_total = Ticket.objects.n_total(self.request.user)
             if n_solved and n_total:
                 context['porc_solved'] = n_solved * 100 / n_total
                 context['porc_pending'] = 100 - context['porc_solved']
@@ -52,18 +47,22 @@ class ContextMixin(SuccessMessageMixin, View):
             else:
                 context['porc_solved'] = 100
                 context['porc_pending'] = 0
-        if statistic_times:
-            context['statistic_times'] = statistic_times
+        if stt_times:
+            context['statistic_times'] = stt_times
             all_tickets = Ticket.objects.all()
             if all_tickets.filter(state__gt=7):
                 context['fastest'] = all_tickets.filter(state__gt=7
                     ).order_by('resolution_delta'
                     )[0].humanized_delta()
-                context['media'] = timedelta(
-                    seconds=sum(
-                        [t.resolution_delta for t in all_tickets.filter(
-                                state__gt=7)]) / n_solved
-                    )
+                if n_solved:
+                    context['media'] = timedelta(
+                        seconds=sum(
+                            [t.resolution_delta for t in all_tickets.filter(
+                                    state__gt=7)]) / n_solved
+                        )
+                else:
+                    context['media'] = 'N/A'
+
         return context
 
 
@@ -120,7 +119,7 @@ class TicketUpdate(ContextMixin, Login_required_mixin, TicketMixin,
     success_url = reverse_lazy('ticketList')
 
     def getHeader(self, date, user):
-        header_msg = _('** {date} [{user}]: ').format(date=date, user=user)
+        header_msg = _('{date} [user: {user}] ').format(date=date, user=user)
         return header_msg
 
     def get_form_class(self):

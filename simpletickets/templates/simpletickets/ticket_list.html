@@ -54,7 +54,7 @@
                                 <button disabled="disabled" type="button" class="btn btn-default" title="no attachment"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></button>
                             {% endif %}
                             {% if ST_MNTR %}
-                                <button type="button" class="btn btn-info" title="monitor file"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></button>
+                                <a href={{ ticket.mntrfile }} role="button" class="btn btn-primary" title="progress file"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></a>
                             {% endif %}
                         </div>
                     </td>

@@ -12,7 +12,7 @@ from django.conf import settings
 from .settings import (ST_ATTACHMENTS, ST_DELTA_CLOSE,
     ST_TCKT_TYPE, ST_TCKT_SEVERITY, ST_TCKT_STATE,
     )
-from .helpers import monitor, monitorfile
+from .helpers import monitor, monitorfile, monitorfile_url
 
 from .simpleemail.email_helper import EmailManager
 
@@ -22,20 +22,24 @@ def uploadAttachment(instance, filename):
 
 
 class TicketManager(models.Manager):
-    def n_solved(self):
-        return len(Ticket.objects.filter(state__gt=7))
+    def n_solved(self, user):
+        return len(Ticket.objects.filter(state__gt=7, user=user))
 
-    def n_total(self):
-        return len(Ticket.objects.all())
+    def n_total(self, user):
+        return len(Ticket.objects.filter(user=user))
 
     def all(self):
         all_objects = super(TicketManager, self).all()
-        for obj in all_objects:
-            if obj.state == 8 and (
-                    obj.resolution_date + ST_DELTA_CLOSE <
-                    timezone.now()):
-                obj.state = 9
-                obj.save()
+
+        # rewrite the all() method
+        # so we can update files older than ST_DELTA_CLOSE to state 9
+        now_minus_delta = timezone.now() - ST_DELTA_CLOSE
+        state_8_delta = all_objects.filter(
+            state=8,
+            resolution_date__lt=now_minus_delta
+            )
+        state_8_delta.update(state=9)
+
         return all_objects
 
 
@@ -70,6 +74,9 @@ class Ticket(models.Model):
     resolution_delta = models.FloatField(_('delayed time in seconds'),
         blank=True, null=True)
 
+    def mntrfile(self):
+        return monitorfile_url(self)
+
     def resolucion_tag(self):
         return mark_safe(self.resolution_text)
 
@@ -84,7 +91,7 @@ class Ticket(models.Model):
                 self
                 )
         else:
-            header_msg = _('#### Ticket created at {date}\n').format(
+            header_msg = _('{date} #### Ticket created ####\n').format(
                 date=self.creation_date,
                 )
         if self.state == 1:
