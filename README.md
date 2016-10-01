@@ -59,6 +59,21 @@ ST_FL_MNTR_STAFF = True
 ST_FL_MNTR_OWNER = False
 ```
 
+**GROUPS**
+*simpletickets* shows the list of tickets deppending on what group they belong,
+you can configure those groups with this two variables:
+
+```python
+ST_STAFF_GNAME = 'simpleticket_staff'
+ST_ADMIN_GNAME = 'simpleticket_admin'
+```
+Staff is the regular ticket staff member and admin are (you guessed) administrators.
+
+You can use this single time command to create the groups if you havent done that already.
+```bash
+python manage.py st_create_groups
+```
+
 ##### MODEL
 These are the configuration variables that modify the models in your system,
 Understand that ST_TCKT_TYPE, ST_TCKT_SEVERITY and ST_TCKT_STATE are modification of the database models and so in this case a migration will be needed!
