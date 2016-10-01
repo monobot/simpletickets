@@ -16,7 +16,7 @@ from .forms import TicketFormUser, TicketFormStaff
 from .helpers import monitor, monitorfile
 from .settings import (BASE_TEMPLATE, ST_FL_MNTR_OWNER, ST_FL_MNTR_STAFF,
     ST_SETT_NUMBERS_STAFF, ST_SETT_NUMBERS_OWNER, ST_SETT_TIMES_STAFF,
-    ST_SETT_TIMES_OWNER, ST_SETT_MAIN_TASKBAR
+    ST_SETT_TIMES_OWNER, ST_SETT_MAIN_TASKBAR, ST_STAFF_GNAME, ST_ADMIN_GNAME
     )
 
 
@@ -76,12 +76,22 @@ class Login_required_mixin(View):
 
 class TicketMixin(object):
     def get_queryset(self):
-        if self.request.user.is_staff:
+        user = self.request.user
+        is_ticket_manager = user.groups.filter(name=ST_STAFF_GNAME).exists()
+        is_ticket_admin = user.groups.filter(name=ST_ADMIN_GNAME).exists()
+        if is_ticket_manager:
+            print 'is manager'
             return Ticket.objects.filter(
                 Q(state=1) |
-                Q(staff=self.request.user, state__lt=9)
+                Q(staff=user, state__lt=9)
                 )
-        return Ticket.objects.filter(user=self.request.user)
+        elif is_ticket_admin:
+            print 'is admin'
+            return Ticket.objects.filter(
+                Q(state=1) |
+                Q(state__lt=9)
+                )
+        return Ticket.objects.filter(user=user)
 
     def get_object(self):
         return self.get_queryset().get(id=self.kwargs['ST_id'])

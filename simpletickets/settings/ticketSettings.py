@@ -11,6 +11,9 @@ ST_REST_API = getattr(settings, 'ST_REST_API', True)
 
 API_BASE_URL = getattr(settings, 'API_BASE_URL', 'api')
 
+ST_STAFF_GNAME = 'simpleticket_staff'
+ST_ADMIN_GNAME = 'simpleticket_admin'
+
 MONITOR_FILES_DIR = 'monitors'
 ATTACHMENTS_DIR = 'tickets'
 
