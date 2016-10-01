@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 from setuptools import setup
 
@@ -17,7 +18,7 @@ setup(
             'users and staff.',
     long_description=README,
     url='https://github.com/monobot/simpletickets',
-    download_url='https://github.com/monobot/simpletickets/tarball/0.1',
+    download_url='https://github.com/monobot/simpletickets',
     author='Héctor Alvarez (monobot)',
     author_email='monobot.soft@gmail.com',
     keywords=['django', 'tickets'],
