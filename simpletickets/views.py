@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
 
+from django.contrib.auth.models import Group
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.urlresolvers import reverse_lazy
@@ -75,21 +76,27 @@ class Login_required_mixin(View):
 
 
 class TicketMixin(object):
+    staff_group = Group.objects.get_or_create(name=ST_STAFF_GNAME)[0]
+    admin_group = Group.objects.get_or_create(name=ST_ADMIN_GNAME)[0]
+
     def get_queryset(self):
         user = self.request.user
-        is_ticket_manager = user.groups.filter(name=ST_STAFF_GNAME).exists()
-        is_ticket_admin = user.groups.filter(name=ST_ADMIN_GNAME).exists()
-        if is_ticket_manager:
-            print 'is manager'
-            return Ticket.objects.filter(
-                Q(state=1) |
-                Q(staff=user, state__lt=9)
-                )
-        elif is_ticket_admin:
-            print 'is admin'
+        is_ticket_manager = user.groups.filter(
+            name=self.staff_group.name
+            ).exists()
+        is_ticket_admin = user.groups.filter(
+            name=self.admin_group.name
+            ).exists()
+
+        if is_ticket_admin:
             return Ticket.objects.filter(
                 Q(state=1) |
                 Q(state__lt=9)
+                )
+        elif is_ticket_manager:
+            return Ticket.objects.filter(
+                Q(state=1) |
+                Q(staff=user, state__lt=9)
                 )
         return Ticket.objects.filter(user=user)
 
