@@ -1,0 +1,47 @@
+{% extends "core_index.html" %}
+{% block content %}
+<div id="wrapper"> <!-- /#wrapper -->
+    <div id="sidebar-wrapper"> <!-- /#sidebar-wrapper -->
+        <ul class="sidebar-nav">
+            <li>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'logout' %}" role="button">logout</a>
+            {% else %}
+                <a href="{% url 'login' %}" role="button">login</a>
+            {% endif %}
+            <a href="{% url 'ticketList' %}" role="button">tickets</a>
+            </li>
+        </ul>
+    </div> <!-- /#sidebar-wrapper -->
+    <!-- Page Content -->
+    <div class="col-md-12 col-xs-12">
+    {% block messages %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    <a class="close" data-dismiss="alert">×</a>
+                    {{ message|safe }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endblock %}
+    {% block main_content %}
+    {% endblock main_content %}
+    </div>
+</div> <!-- /#wrapper -->
+{% block javascript %}
+    <!-- jQuery -->
+    <script src="{{ STATIC_URL }}js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+
+    <!-- Menu Toggle Script -->
+    <script>
+    $("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+    });
+    </script>
+{% endblock javascript %}
+{% endblock content %}

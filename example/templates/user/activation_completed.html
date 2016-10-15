@@ -1,0 +1,9 @@
+{% extends 'index_lateral.html' %}
+{% block main_content %}
+<h3>Correct!</h3>
+<p>Your account is now active!.</p>
+{% if not user.is_authenticated %}
+<p>Now please <a href="{%url 'login' %}">login</a></p>
+{% endif %}
+<p>Back to our <a href="{%url 'home' %}">Homepage</a></p>
+{% endblock %}

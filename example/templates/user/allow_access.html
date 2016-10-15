@@ -1,0 +1,18 @@
+{% extends 'index_lateral.html' %}
+{% load bootstrap %}
+{% block main_content %}
+<div>
+    <div class="col-md-12 col-xs-12">
+        <h3>Do you want to allow this computer to access your Profile?</h3>
+        <p>If so please identify yourself again.</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form|bootstrap }}
+            Fields marked with * are mandatory
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

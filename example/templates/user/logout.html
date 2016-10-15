@@ -1,0 +1,6 @@
+{% extends 'index_lateral.html' %}
+{% block main_content %}
+<h3>You have logged out of the system</h3>
+<p><a href="{% url 'login' %}" title="Login">Login</a></p>
+<p>return <a class="medium_button" href="{% url 'home' %}" title="Home">Homepage</a></p>
+{% endblock %}

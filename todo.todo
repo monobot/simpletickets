@@ -2,9 +2,9 @@ Things to do:
     ✔ config file
         ✔ better explanation
     ✔ package creation
-    ☐ ROLES
-        ☐ ST_agent
-        ☐ ST_mng
+    ✔ ROLES
+        ✔ ST_agent
+        ✔ ST_mng
         ☐ emails to agents, and users
     ☐ TEST
         ☐ models

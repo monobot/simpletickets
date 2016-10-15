@@ -1,0 +1,27 @@
+{% extends 'index_lateral.html' %}
+{% load bootstrap %}
+{% block main_content %}
+{% if user.is_authenticated %}
+    Wellcome <b>{{ user.username }}</b>
+
+    Do you want to change your password?
+    <a href="{% url 'changepassword' %}" title="Change your Password">Change your Password</a>
+{% else %}
+    Please Log In
+
+    <form action="." method="POST">
+        {% csrf_token %}
+            {{ form|bootstrap }}
+            Fields marked with * are mandatory
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+    </form>
+
+    Did you forgot your password?
+    If you forgot your password you can:
+    <a class="medium_button" href="{% url 'changepassword' %}" title="Recover Password">Recover Password</a>
+
+    You can register for free with our free cabaana program.
+{% endif %}
+{% endblock %}
