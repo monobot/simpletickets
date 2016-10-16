@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: simpletickets
-Version: 0.1
+Version: 0.2
 Summary: A simple Django app to create a ticketting system between users and staff.
 Home-page: https://github.com/monobot/simpletickets
 Author: Héctor Alvarez (monobot)
